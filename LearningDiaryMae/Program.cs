@@ -68,7 +68,7 @@ namespace LearningDiaryMae
 
             for (int i=0; i < diary.Count; i++)
             {
-
+                Console.WriteLine("hi");
             }
         }
     }
