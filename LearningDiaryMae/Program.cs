@@ -66,9 +66,9 @@ namespace LearningDiaryMae
                 diary.Add(newTopic);
             }
 
-            for (int i=0; i < diary.Count; i++)
+            foreach (Topic item in diary)
             {
-
+                Console.WriteLine(item.GetTitle());
             }
         }
     }
