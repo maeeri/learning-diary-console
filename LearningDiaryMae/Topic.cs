@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 
 namespace LearningDiaryMae
 {
     class Topic
     {
-        public Topic()
-        {
+        public Topic() { }
 
-        }
+        public Topic(string Title, DateTime startLearningDate) { }
 
         public int Id { get; set; }
 
