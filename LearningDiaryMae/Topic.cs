@@ -17,8 +17,21 @@ namespace LearningDiaryMae
         public DateTime StartLearningDate { get; set; }
         public bool InProgress { get; set; }
         public DateTime CompletionDate { get; set; }
+        public DateTime LastEditDate { get; set; }
 
-        public double TimeSpent() => Convert.ToDouble(DateTime.Now-StartLearningDate);
+        public double TimeSpent()
+        {
+            if (InProgress == true)
+            {
+                return Convert.ToDouble(DateTime.Now - StartLearningDate);
+            }
+
+            else
+            {
+                return Convert.ToDouble(CompletionDate - StartLearningDate);
+            }
+        }
+
         public string GetTitle() => Title;
     }
 }
