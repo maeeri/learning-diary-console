@@ -10,10 +10,9 @@ using CsvHelper.Configuration;
 
 namespace LearningDiaryMae
 {
-    class Topic
+    public class Topic
     {
-        public Topic() { }
-        public Topic(string Title, DateTime startLearningDate) { }
+        //variables
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
@@ -25,35 +24,18 @@ namespace LearningDiaryMae
         public DateTime LastEditDate { get; set; }
         public double TimeSpent { get; set; }
 
+        //method to calculate time spent on the topic
         public double CalculateTimeSpent()
         {
-            if (InProgress == true)
-            {
-                return Convert.ToDouble(DateTime.Now - StartLearningDate);
-            }
-
-            else
-            {
-                return Convert.ToDouble(CompletionDate - StartLearningDate);
-            }
+            TimeSpan timeSpent = CompletionDate - StartLearningDate;
+            double timeSpentDouble = timeSpent.TotalDays;
+            return timeSpentDouble;
         }
 
-        public string GetTitle() => Title;
+        //override the ToString-method in csv-compatible form
+        public override string ToString() => $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}";
 
-        public void WriteToFile(string filePath, Topic topic)
-        {
-            {
-                using var mem = new MemoryStream();
-                using var writer = new StreamWriter(mem);
-                using var csvWriter = new CsvWriter(writer, CultureInfo.CurrentCulture);
-                csvWriter.NextRecord();
-            }
-        }
-
-        public override string ToString()
-        {
-            return
-                $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}";
-        }
+        //constructor with id
+        public Topic(int id) => this.Id = id;
     }
 }
