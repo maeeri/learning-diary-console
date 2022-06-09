@@ -120,7 +120,6 @@ namespace LearningDiaryMae
                                     string title = csvReader.GetField(1);
                                     Console.WriteLine($"- Title: {title}");
                                 }
-
                                 Console.WriteLine("\n\n");
                             }
                             break;
