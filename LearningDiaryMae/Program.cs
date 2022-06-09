@@ -4,6 +4,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Security.Cryptography.X509Certificates;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -13,15 +14,15 @@ namespace LearningDiaryMae
     {
         static void Main(string[] args)
         {
-            //declare variables
+            //declare universal variables
             bool exit = false;
             int counter = 0;
             string path = @"C:\Users\Mae\source\repos\LearningDiaryMae\Diary.csv";
 
-            //create csv-file
             if (!File.Exists(path))
             {
-                using StreamWriter diary = File.CreateText(path);
+                //create csv-file
+                File.WriteAllText(path, String.Empty);
             }
 
             //loop topic editing
@@ -39,7 +40,7 @@ namespace LearningDiaryMae
 
                     switch (answer)
                     {
-                        case 1:
+                        case 1: //adding a topic
                             Topic newTopic = new Topic();
                             newTopic.Id = counter;
                             counter++;
@@ -73,7 +74,7 @@ namespace LearningDiaryMae
                                 newTopic.InProgress = false;
                             }
 
-                            else
+                            else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
                             {
                                 newTopic.InProgress = true;
                             }
@@ -86,41 +87,55 @@ namespace LearningDiaryMae
 
                             newTopic.LastEditDate = DateTime.Now;
 
-                            StreamWriter diary = File.AppendText(path);
-                            diary.WriteLine(newTopic);
+                            newTopic.TimeSpent = newTopic.CalculateTimeSpent();
+
+                            File.AppendAllText(path, newTopic.ToString());
+
 
                             break;
 
-                        case 2:
+                        case 2: //editing a task, to be added at one point or another
 
                             break;
 
-                        case 3:
-                            //var[] diaryArray = File.ReadAllLines(path);
-                            //foreach (var item in diaryArray)
-                            //{
-                            //    Console.WriteLine("Title: " + item.GetTitle() + ". Id: " + item.Id);
-                            //}
+                        case 3: //printing a list of topics with their ids
+                            var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
+                            {
+                                HasHeaderRecord = false,
+                                Comment = '#',
+                                AllowComments = true,
+                                Delimiter = ";",
+                            };
+                            {
+                                using var streamReader = File.OpenText(path);
+                                using var csvReader = new CsvReader(streamReader, csvConfig);
+                                while (csvReader.Read())
+                                {
+                                    string id = csvReader.GetField(0);
+                                    string title = csvReader.GetField(1);
 
+                                    Console.WriteLine($"ID: {id}, Title: {title}");
+                                }
+                            }
                             break;
 
-                        case 4:
+                        case 4: //editing a topic, to be added at one point or another
                             Console.WriteLine("Function to be added... I think.");
                             break;
 
-                        case 5:
+                        case 5: //exit the app
                             Console.WriteLine("Exiting app.");
                             exit = true;
                             break;
 
                         default:
-                            Console.WriteLine("Did you choose a number between 1 and 4?");
+                            Console.WriteLine("Did you choose a number between 1 and 5?");
                             break;
                     }
                 }
-                catch (Exception e)
+                catch //if all else fails, no crash
                 {
-                    Console.WriteLine("Did you choose a number between 1 and 4?");
+                    Console.WriteLine("Did you choose a number between 1 and 5?");
                     continue;
                 }
             } while (exit == false);

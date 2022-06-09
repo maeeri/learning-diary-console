@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Tracing;
+using System.IO;
+using System.Linq;
+using System.Globalization;
 using System.Security.Cryptography.X509Certificates;
-using System.Text;
+using CsvHelper;
+using CsvHelper.Configuration;
 
 namespace LearningDiaryMae
 {
@@ -18,8 +23,9 @@ namespace LearningDiaryMae
         public bool InProgress { get; set; }
         public DateTime CompletionDate { get; set; }
         public DateTime LastEditDate { get; set; }
+        public double TimeSpent { get; set; }
 
-        public double TimeSpent()
+        public double CalculateTimeSpent()
         {
             if (InProgress == true)
             {
@@ -33,5 +39,21 @@ namespace LearningDiaryMae
         }
 
         public string GetTitle() => Title;
+
+        public void WriteToFile(string filePath, Topic topic)
+        {
+            {
+                using var mem = new MemoryStream();
+                using var writer = new StreamWriter(mem);
+                using var csvWriter = new CsvWriter(writer, CultureInfo.CurrentCulture);
+                csvWriter.NextRecord();
+            }
+        }
+
+        public override string ToString()
+        {
+            return
+                $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}";
+        }
     }
 }
