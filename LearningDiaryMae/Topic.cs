@@ -10,12 +10,9 @@ using CsvHelper.Configuration;
 
 namespace LearningDiaryMae
 {
-    public class Topic
+    public class Topic: DiaryItem
     {
         //variables
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public string Description { get; set; }
         public double EstimatedTimeToMaster { get; set; }
         public string Source { get; set; }
         public DateTime StartLearningDate { get; set; }
@@ -33,7 +30,7 @@ namespace LearningDiaryMae
         }
 
         //override the ToString-method in csv-compatible form
-        public override string ToString() => $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}";
+        public override string ToString() => $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}\n";
 
         //constructor with id
         public Topic(int id) => this.Id = id;

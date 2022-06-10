@@ -28,7 +28,7 @@ namespace LearningDiaryMae
             {
                 //create csv-file with headers
                 string arrayString = String.Join(";", headerArray);
-                File.WriteAllText(path, arrayString);
+                File.WriteAllText(path, arrayString + "\n");
             }
 
             //loop topic editing
@@ -57,7 +57,7 @@ namespace LearningDiaryMae
                             Console.WriteLine("Describe the area of study: ");
                             newTopic.Description = Console.ReadLine();
 
-                            Console.WriteLine("How much time do you estimate you need for mastering the topic?");
+                            Console.WriteLine("How much time (days) do you estimate you need for mastering the topic?");
                             newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
 
                             Console.WriteLine("Did you use a source? Yes/no");
@@ -104,7 +104,7 @@ namespace LearningDiaryMae
                         case 3: //printing a list of topics
                             var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
                             {
-                                HasHeaderRecord = true,
+                                HasHeaderRecord = false,
                                 Comment = '#',
                                 AllowComments = true,
                                 Delimiter = ";",
@@ -118,9 +118,13 @@ namespace LearningDiaryMae
                                 while (csvReader.Read())
                                 {
                                     string title = csvReader.GetField(1);
-                                    Console.WriteLine($"- Title: {title}");
+                                    string id = csvReader.GetField(0).ToString();
+                                    Console.Write("{0,3}", id);
+                                    Console.Write("\t");
+                                    Console.WriteLine(title);
+                                    //Console.WriteLine($"|{id}|\t|{title}|");
                                 }
-                                Console.WriteLine("\n\n");
+                                Console.WriteLine("\n");
                             }
                             break;
 
