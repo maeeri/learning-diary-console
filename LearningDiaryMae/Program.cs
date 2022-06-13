@@ -24,8 +24,6 @@ namespace LearningDiaryMae
                 "Id", "Title", "Description", "Estimated time to master", "Source", "Date started", "Date completed",
                 "Time spent", "Last edit", "In progress"
             };
-            Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
-            List<Topic> diaryList = new List<Topic>();
 
             if (!File.Exists(path))
             {
@@ -34,11 +32,13 @@ namespace LearningDiaryMae
                 File.WriteAllText(path, arrayString + "\n");
             }
 
+            Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
+            List<Topic> diaryList = new List<Topic>;
+
             //figure this out later, just for fun
             string name = "your friendly Learning Diary";
             Console.WriteLine($"Welcome to {name}");
-            //if (name == "your friendly learning diary")
-
+            //if (name == "your friendly Learning Diary")
 
             //loop topic editing
             do
@@ -56,54 +56,9 @@ namespace LearningDiaryMae
 
                     switch (answer)
                     {
-                        case 1: //adding a topic
-                            Topic newTopic = new Topic(counter);
+                        case 1: //adding a topic to dictionary with method
+                            diaryDictionary.Add(counter, AddTopic(counter));
                             counter++;
-
-                            Console.WriteLine("Title: ");
-                            newTopic.Title = Console.ReadLine();
-
-                            Console.WriteLine("Describe the area of study: ");
-                            newTopic.Description = Console.ReadLine();
-
-                            Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
-                            newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
-
-                            Console.WriteLine("Did you use a source? Yes/no");
-                            string input = Console.ReadLine();
-
-                            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
-                            {
-                                Console.WriteLine("Which source did you use?");
-                                newTopic.Source = Console.ReadLine();
-                            }
-
-                            Console.WriteLine("When did you start studying? DD/MM/YYYY");
-                            newTopic.StartLearningDate = Convert.ToDateTime(Console.ReadLine());
-
-                            Console.WriteLine("Is your study complete? Yes/no");
-                            input = Console.ReadLine();
-
-                            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
-                            {
-                                newTopic.InProgress = false;
-                            }
-
-                            else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
-                            {
-                                newTopic.InProgress = true;
-                            }
-
-                            if (newTopic.InProgress == false)
-                            {
-                                Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
-                                newTopic.CompletionDate = Convert.ToDateTime(Console.ReadLine());
-                                newTopic.TimeSpent = newTopic.CalculateTimeSpent();
-                            }
-
-                            newTopic.LastEditDate = DateTime.Now;
-
-                            diaryList.Add(newTopic);
                             break;
 
                         case 2: //adding a task, to be added at one point or another
@@ -111,34 +66,12 @@ namespace LearningDiaryMae
                             break;
 
                         case 3: //printing a list of topics
-                            var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
-                            {
-                                HasHeaderRecord = false,
-                                Comment = '#',
-                                AllowComments = true,
-                                Delimiter = ";",
-                            };
-
-                            {
-                                Console.WriteLine("A list of your study topics:");
-
-                                using var streamReader = File.OpenText(path);
-                                using var csvReader = new CsvReader(streamReader, csvConfig);
-                                while (csvReader.Read())
-                                {
-                                    string title = csvReader.GetField(1);
-                                    string id = csvReader.GetField(0).ToString();
-                                    Console.Write("{0,3}", id);
-                                    Console.Write("\t");
-                                    Console.WriteLine(title);
-                                }
-                                Console.WriteLine("\n");
-                            }
+                            PrintTopics(path);
                             break;
 
                         case 4: //finding a topic
                             Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
-                            input = Console.ReadLine();
+                            string input = Console.ReadLine();
                             int edit = 0;
 
                             //finds the Key of the Topic to be edited
@@ -160,10 +93,10 @@ namespace LearningDiaryMae
                                 }
                             }
 
-                            string printout = $"Topic title: {diaryDictionary[edit].Title}" +
-                                              $"Description: {diaryDictionary[edit].Description}" +
-                                              $"Start date: {diaryDictionary[edit].StartLearningDate.ToString("d.M.yyyy")}" +
-                                              $"Last edit date: {diaryDictionary[edit].LastEditDate.ToString("d.M.yyyy")}";
+                            string printout = $"Topic title: {diaryDictionary[edit].Title}\n" +
+                                              $"Description: {diaryDictionary[edit].Description}\n" +
+                                              $"Start date: {diaryDictionary[edit].StartLearningDate:d.M.yyyy}\n" +
+                                              $"Last edit date: {diaryDictionary[edit].LastEditDate:d.M.yyyy}\n";
                                               Console.WriteLine(printout);
                             break;
 
@@ -182,11 +115,11 @@ namespace LearningDiaryMae
                     Console.WriteLine("Oh dear, we encountered an error... Please try again.\n" + e);
                     continue;
                 }
+
             } while (exit == false);
 
             foreach (Topic entry in diaryList)
             {
-                diaryDictionary.Add(entry.Id, entry);
                 File.AppendAllText(path, entry.ToString());
             }
             diaryList.Clear();
@@ -194,6 +127,83 @@ namespace LearningDiaryMae
             foreach (var entry in diaryDictionary)
             {
                 Console.WriteLine(entry.Key + "\t" + entry.Value.Title);
+            }
+        }
+
+        public static Topic AddTopic(int counter)
+        {
+            Topic newTopic = new Topic(counter);
+
+            Console.WriteLine("Title: ");
+            newTopic.Title = Console.ReadLine();
+
+            Console.WriteLine("Describe the area of study: ");
+            newTopic.Description = Console.ReadLine();
+
+            Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
+            newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
+
+            Console.WriteLine("Did you use a source? Yes/no");
+            string input = Console.ReadLine();
+
+            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Which source did you use?");
+                newTopic.Source = Console.ReadLine();
+            }
+
+            Console.WriteLine("When did you start studying? DD/MM/YYYY");
+            newTopic.StartLearningDate = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Is your study complete? Yes/no");
+            input = Console.ReadLine();
+
+            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                newTopic.InProgress = false;
+            }
+
+            else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
+            {
+                newTopic.InProgress = true;
+            }
+
+            if (newTopic.InProgress == false)
+            {
+                Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
+                newTopic.CompletionDate = Convert.ToDateTime(Console.ReadLine());
+            }
+            newTopic.TimeSpent = newTopic.CalculateTimeSpent();
+            newTopic.LastEditDate = DateTime.Now;
+
+            return newTopic;
+        }
+
+        //prints topics from csv file
+        public static void PrintTopics(string path)
+        {
+            var csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
+            {
+                HasHeaderRecord = true,
+                Comment = '#',
+                AllowComments = true,
+                Delimiter = ";",
+            };
+
+            {
+                Console.WriteLine("A list of your study topics:");
+
+                using var streamReader = File.OpenText(path);
+                using var csvReader = new CsvReader(streamReader, csvConfig);
+                while (csvReader.Read())
+                {
+                    string title = csvReader.GetField(1);
+                    string id = csvReader.GetField(0).ToString();
+                    Console.Write("{0,3}", id);
+                    Console.Write("\t");
+                    Console.WriteLine(title);
+                }
+                Console.WriteLine("\n");
             }
         }
     }

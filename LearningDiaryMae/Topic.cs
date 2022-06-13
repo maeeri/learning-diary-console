@@ -24,8 +24,20 @@ namespace LearningDiaryMae
         //method to calculate time spent on the topic
         public double CalculateTimeSpent()
         {
-            TimeSpan timeSpent = CompletionDate - StartLearningDate;
-            double timeSpentDouble = timeSpent.TotalMinutes;
+            TimeSpan timeSpent;
+            double timeSpentDouble;
+            if (InProgress == true)
+            {
+                timeSpent = DateTime.Now - StartLearningDate;
+                timeSpentDouble = timeSpent.TotalDays;
+            }
+
+            else
+            {
+                timeSpent = CompletionDate - StartLearningDate;
+                timeSpentDouble = timeSpent.TotalDays;
+            }
+
             return timeSpentDouble;
         }
 
