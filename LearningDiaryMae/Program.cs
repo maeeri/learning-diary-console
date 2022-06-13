@@ -42,7 +42,8 @@ namespace LearningDiaryMae
                                       "2. Add a task\n" +
                                       "3. Print a current list of topics\n" +
                                       "4. Edit a topic\n" +
-                                      "5. Exit the app");
+                                      "5. Delete a topic" +
+                                      "6. Exit the app");
                     int answer = Convert.ToInt32(Console.ReadLine());
 
                     switch (answer)
@@ -132,13 +133,17 @@ namespace LearningDiaryMae
                             Console.WriteLine("Function to be added... I think.");
                             break;
 
-                        case 5: //exit the app
+                        case 5:
+
+                            break;
+
+                        case 6: //exit the app
                             Console.WriteLine("Exiting app.");
                             exit = true;
                             break;
 
                         default:
-                            Console.WriteLine("Did you choose a number between 1 and 5?");
+                            Console.WriteLine("Did you choose a number between 1 and 6?");
                             break;
                     }
                 }

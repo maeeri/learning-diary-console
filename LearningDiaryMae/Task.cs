@@ -11,11 +11,25 @@ namespace LearningDiaryMae
         public DateTime Deadline { get; set; }
         public bool Done { get; set; }
 
+        //have to look into this a bit more
         public enum Priority
         {
             Urgent,
             NotUrgent,
             Optional
+        }
+
+        public Task(string title, bool done, int priority)
+        {
+            Title = title;
+            Done = done;
+            
+        }
+
+        public void AddNotes()
+        {
+            Console.WriteLine("Add your note: ");
+            Notes = Console.ReadLine();
         }
 
 

@@ -25,7 +25,7 @@ namespace LearningDiaryMae
         public double CalculateTimeSpent()
         {
             TimeSpan timeSpent = CompletionDate - StartLearningDate;
-            double timeSpentDouble = timeSpent.TotalDays;
+            double timeSpentDouble = timeSpent.TotalMinutes;
             return timeSpentDouble;
         }
 
