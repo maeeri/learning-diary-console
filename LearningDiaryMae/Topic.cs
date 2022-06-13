@@ -34,5 +34,6 @@ namespace LearningDiaryMae
 
         //constructor with id
         public Topic(int id) => this.Id = id;
+
     }
 }

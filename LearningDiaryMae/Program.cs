@@ -4,6 +4,7 @@ using System.Diagnostics.Tracing;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Cryptography.X509Certificates;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -23,6 +24,8 @@ namespace LearningDiaryMae
                 "Id", "Title", "Description", "Estimated time to master", "Source", "Date started", "Date completed",
                 "Time spent", "Last edit", "In progress"
             };
+            Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
+            List<Topic> diaryList = new List<Topic>();
 
             if (!File.Exists(path))
             {
@@ -30,6 +33,12 @@ namespace LearningDiaryMae
                 string arrayString = String.Join(";", headerArray);
                 File.WriteAllText(path, arrayString + "\n");
             }
+
+            //figure this out later, just for fun
+            string name = "your friendly Learning Diary";
+            Console.WriteLine($"Welcome to {name}");
+            //if (name == "your friendly learning diary")
+
 
             //loop topic editing
             do
@@ -41,9 +50,8 @@ namespace LearningDiaryMae
                                       "1. Add a topic of study\n" +
                                       "2. Add a task\n" +
                                       "3. Print a current list of topics\n" +
-                                      "4. Edit a topic\n" +
-                                      "5. Delete a topic" +
-                                      "6. Exit the app");
+                                      "4. Find a topic by id or title\n" +
+                                      "5. Exit the app");
                     int answer = Convert.ToInt32(Console.ReadLine());
 
                     switch (answer)
@@ -58,7 +66,7 @@ namespace LearningDiaryMae
                             Console.WriteLine("Describe the area of study: ");
                             newTopic.Description = Console.ReadLine();
 
-                            Console.WriteLine("How much time (days) do you estimate you need for mastering the topic?");
+                            Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
                             newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
 
                             Console.WriteLine("Did you use a source? Yes/no");
@@ -95,11 +103,11 @@ namespace LearningDiaryMae
 
                             newTopic.LastEditDate = DateTime.Now;
 
-                            File.AppendAllText(path, newTopic.ToString());
+                            diaryList.Add(newTopic);
                             break;
 
-                        case 2: //editing a task, to be added at one point or another
-                            Console.WriteLine("Hey, something to look forward to!");
+                        case 2: //adding a task, to be added at one point or another
+
                             break;
 
                         case 3: //printing a list of topics
@@ -123,27 +131,49 @@ namespace LearningDiaryMae
                                     Console.Write("{0,3}", id);
                                     Console.Write("\t");
                                     Console.WriteLine(title);
-                                    //Console.WriteLine($"|{id}|\t|{title}|");
                                 }
                                 Console.WriteLine("\n");
                             }
                             break;
 
-                        case 4: //editing a topic, to be added at one point or another
-                            Console.WriteLine("Function to be added... I think.");
+                        case 4: //finding a topic
+                            Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
+                            input = Console.ReadLine();
+                            int edit = 0;
+
+                            //finds the Key of the Topic to be edited
+                            if (input == "1")
+                            {
+                                Console.WriteLine("Which topic would you like to print?");
+                                int idOption = Convert.ToInt32(Console.ReadLine());
+                                edit = idOption;
+                            }
+
+                            else if (input == "2")
+                            {
+                                Console.WriteLine("Which topic would you like to print?");
+                                string titleOption = Console.ReadLine();
+                                foreach (var value in diaryDictionary)
+                                {
+                                    if (titleOption.Equals(value.Value.Title, StringComparison.OrdinalIgnoreCase))
+                                        edit = value.Key;
+                                }
+                            }
+
+                            string printout = $"Topic title: {diaryDictionary[edit].Title}" +
+                                              $"Description: {diaryDictionary[edit].Description}" +
+                                              $"Start date: {diaryDictionary[edit].StartLearningDate.ToString("d.M.yyyy")}" +
+                                              $"Last edit date: {diaryDictionary[edit].LastEditDate.ToString("d.M.yyyy")}";
+                                              Console.WriteLine(printout);
                             break;
 
-                        case 5:
-
-                            break;
-
-                        case 6: //exit the app
+                        case 5: //exit the app
                             Console.WriteLine("Exiting app.");
                             exit = true;
                             break;
 
                         default:
-                            Console.WriteLine("Did you choose a number between 1 and 6?");
+                            Console.WriteLine("Did you choose a number between 1 and 5?");
                             break;
                     }
                 }
@@ -153,6 +183,18 @@ namespace LearningDiaryMae
                     continue;
                 }
             } while (exit == false);
+
+            foreach (Topic entry in diaryList)
+            {
+                diaryDictionary.Add(entry.Id, entry);
+                File.AppendAllText(path, entry.ToString());
+            }
+            diaryList.Clear();
+
+            foreach (var entry in diaryDictionary)
+            {
+                Console.WriteLine(entry.Key + "\t" + entry.Value.Title);
+            }
         }
     }
 }
