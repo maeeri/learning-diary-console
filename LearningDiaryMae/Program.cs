@@ -16,7 +16,7 @@ namespace LearningDiaryMae
         static void Main(string[] args)
         {
             //declare universal variables
-            bool exit = false;
+            bool exit = false, nameChanged = false;
             int counter = 0;
             string path = @"C:\Users\Mae\source\repos\LearningDiaryMae\Diary.csv";
             string[] headerArray = new string[]
@@ -33,12 +33,31 @@ namespace LearningDiaryMae
             }
 
             Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
-            List<Topic> diaryList = new List<Topic>;
+            List<Topic> diaryList = new List<Topic>();
 
-            //figure this out later, just for fun
+            //read file into list
+
+            //using (TextReader diaryReader = new StreamReader(path))
+            //{
+            //    using (var csv = new CsvReader(diaryReader))
+            //    {
+            //        var records = csv.GetRecords<Topic>();
+            //        diaryList = records.ToList();
+            //    }
+            //}
+
+            {
+                
+            }
+
             string name = "your friendly Learning Diary";
             Console.WriteLine($"Welcome to {name}");
-            //if (name == "your friendly Learning Diary")
+            if (!nameChanged)
+            {
+                Console.WriteLine("Type the name of your learning diary: ");
+                name = Console.ReadLine();
+                nameChanged = true;
+            }
 
             //loop topic editing
             do
@@ -71,18 +90,18 @@ namespace LearningDiaryMae
 
                         case 4: //finding a topic
                             Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
-                            string input = Console.ReadLine();
+                            int input = Convert.ToInt32(Console.ReadLine());
                             int edit = 0;
 
                             //finds the Key of the Topic to be edited
-                            if (input == "1")
+                            if (input == 1)
                             {
                                 Console.WriteLine("Which topic would you like to print?");
                                 int idOption = Convert.ToInt32(Console.ReadLine());
                                 edit = idOption;
                             }
 
-                            else if (input == "2")
+                            else if (input == 2)
                             {
                                 Console.WriteLine("Which topic would you like to print?");
                                 string titleOption = Console.ReadLine();
@@ -97,7 +116,7 @@ namespace LearningDiaryMae
                                               $"Description: {diaryDictionary[edit].Description}\n" +
                                               $"Start date: {diaryDictionary[edit].StartLearningDate:d.M.yyyy}\n" +
                                               $"Last edit date: {diaryDictionary[edit].LastEditDate:d.M.yyyy}\n";
-                                              Console.WriteLine(printout);
+                            Console.WriteLine(printout);
                             break;
 
                         case 5: //exit the app
