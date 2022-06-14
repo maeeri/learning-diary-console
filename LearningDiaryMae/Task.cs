@@ -14,16 +14,15 @@ namespace LearningDiaryMae
         //have to look into this a bit more
         public enum Priority
         {
-            Urgent,
-            NotUrgent,
-            Optional
+            Urgent = 1,
+            NotUrgent = 2,
+            Optional = 3
         }
 
-        public Task(string title, bool done, int priority)
+        public Task(string title, bool done)
         {
             Title = title;
             Done = done;
-            
         }
 
         public void AddNotes()
