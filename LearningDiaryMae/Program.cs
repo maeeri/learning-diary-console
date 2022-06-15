@@ -131,6 +131,17 @@ namespace LearningDiaryMae
                             edit = ChooseIdOrTitle("delete");
                             Console.WriteLine(diaryDictionary[edit].Title + " deleted.");
                             diaryDictionary.Remove(edit);
+                            Dictionary<int, Topic> tempDictionary = new Dictionary<int, Topic>();
+
+                            counter = 0;
+                            foreach (var item in diaryDictionary)
+                            {
+                                tempDictionary[counter] = diaryDictionary[item.Key];
+                                tempDictionary[counter].Id = counter;
+                                counter++;
+                            }
+                            diaryDictionary.Clear();
+                            diaryDictionary = tempDictionary;
                             break;
 
                         case 7: //exit the app

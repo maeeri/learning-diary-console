@@ -35,7 +35,7 @@ namespace LearningDiaryMae
             return timeSpentDouble;
         }
 
-        public Topic FromCsv(string csvLine)
+        public static Topic FromCsv(string csvLine)
         {
             string[] columns = csvLine.Split(';');
             Topic newTopic = new Topic();
