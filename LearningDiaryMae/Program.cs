@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Globalization;
-using System.Net.Sockets;
-using System.Xml.Serialization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
@@ -41,13 +39,16 @@ namespace LearningDiaryMae
                 File.WriteAllText(path, arrayString + "\n");
             }
 
-            using var streamReader = File.OpenText(path);
-            using var csvReader = new CsvReader(streamReader, csvConfig);
-
-            string value = File.ReadAllLines(path)
-                .Skip(1)
-                .Select(v => Topic.FromCsv(v))
-                .ToString(); 
+            using (var streamReader = File.OpenText(path))
+            {
+                using (var csvReader = new CsvReader(streamReader, csvConfig))
+                {
+                    diaryList = File.ReadAllLines(path)
+                        .Skip(1)
+                        .Select(v => Topic.FromCsv(v))
+                        .ToList();
+                };
+            };
 
             //while (csvReader.Read())
             //{
@@ -100,7 +101,7 @@ namespace LearningDiaryMae
                     switch (answer)
                     {
                         case 1: //adding a topic to dictionary with method
-                            Topic newTopic = Topic.AddTopic(counter);
+                            Topic newTopic = AddTopic(counter);
                             diaryDictionary.Add(counter, newTopic);
                             File.AppendAllText(path, newTopic.ToString());
                             counter++;
@@ -172,6 +173,56 @@ namespace LearningDiaryMae
                 }
 
             } while (exit == false);
+        }
+
+        //method to add a topic
+        public static Topic AddTopic(int counter)
+        {
+            Topic newTopic = new Topic(counter);
+
+            Console.WriteLine("Title: ");
+            newTopic.Title = Console.ReadLine();
+
+            Console.WriteLine("Describe the area of study: ");
+            newTopic.Description = Console.ReadLine();
+
+            Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
+            newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
+
+            Console.WriteLine("Did you use a source? Yes/no");
+            string input = Console.ReadLine();
+
+            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                Console.WriteLine("Which source did you use?");
+                newTopic.Source = Console.ReadLine();
+            }
+
+            Console.WriteLine("When did you start studying? DD/MM/YYYY");
+            newTopic.StartLearningDate = Convert.ToDateTime(Console.ReadLine());
+
+            Console.WriteLine("Is your study complete? Yes/no");
+            input = Console.ReadLine();
+
+            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+            {
+                newTopic.InProgress = false;
+            }
+
+            else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
+            {
+                newTopic.InProgress = true;
+            }
+
+            if (newTopic.InProgress == false)
+            {
+                Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
+                newTopic.CompletionDate = Convert.ToDateTime(Console.ReadLine());
+            }
+            newTopic.TimeSpent = newTopic.CalculateTimeSpent();
+            newTopic.LastEditDate = DateTime.Now;
+
+            return newTopic;
         }
 
         //prints topics from csv file
