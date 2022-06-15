@@ -32,52 +32,30 @@ namespace LearningDiaryMae
                 "Time spent", "Last edit", "In progress"
             };
 
-            if (!File.Exists(path))
+            if (File.Exists(path))
             {
-                //create csv-file with headers
-                string arrayString = String.Join(";", headerArray);
-                File.WriteAllText(path, arrayString + "\n");
+                using (var streamReader = File.OpenText(path))
+                {
+                    using (var csvReader = new CsvReader(streamReader, csvConfig))
+                    {
+                        diaryList = File.ReadAllLines(path)
+                            .Skip(1)
+                            .Select(v => Topic.FromCsv(v))
+                            .ToList();
+                    };
+                };
+
+                foreach (var item in diaryList)
+                {
+                    diaryDictionary.Add(item.Id, item);
+                }
             }
 
-            using (var streamReader = File.OpenText(path))
-            {
-                using (var csvReader = new CsvReader(streamReader, csvConfig))
-                {
-                    diaryList = File.ReadAllLines(path)
-                        .Skip(1)
-                        .Select(v => Topic.FromCsv(v))
-                        .ToList();
-                };
-            };
+            //create new csv-file with headers replacing the old one
+            string arrayString = String.Join(";", headerArray);
+            File.WriteAllText(path, arrayString + "\n");
 
-            //while (csvReader.Read())
-            //{
-            //    for (int i = 0; csvReader.TryGetField<string>(i, out value); i++)
-            //    {
-            //        diaryList.Add(Topic.FromCsv());
-            //        //Console.Write($"{value} ");
-            //    }
-
-            //    //Console.WriteLine();
-            //}
-
-            //IEnumerable<string> diaryIEnumerable = File.ReadAllLines(path)
-            //    .Skip(1)
-            //    .Select(index => IEnumerable<string>.FromCsv(index));
-
-            //using (TextReader diaryReader = new StreamReader(path))
-            //{
-            //    using (var csv = new CsvReader(diaryReader))
-            //    {
-            //        var records = csv.GetRecords<Topic>();
-            //        diaryList = records.ToList();
-            //    }
-            //}
-            //foreach (Topic entry in diaryIEnumerable)
-            //{
-            //    diaryDictionary.Add(entry.Id, entry);
-            //    counter++;
-            //}
+            counter = diaryDictionary.Count;
 
             string name = "your friendly Learning Diary";
             Console.WriteLine($"Welcome to {name}");
@@ -95,7 +73,7 @@ namespace LearningDiaryMae
                                       "4. Find a topic by id or title\n" +
                                       "5. Edit a topic\n" + 
                                       "6. Delete a topic\n" +
-                                      "6. Exit the app");
+                                      "7. Exit the app");
                     int answer = Convert.ToInt32(Console.ReadLine());
 
                     switch (answer)
@@ -103,7 +81,6 @@ namespace LearningDiaryMae
                         case 1: //adding a topic to dictionary with method
                             Topic newTopic = AddTopic(counter);
                             diaryDictionary.Add(counter, newTopic);
-                            File.AppendAllText(path, newTopic.ToString());
                             counter++;
                             break;
 
@@ -117,23 +94,19 @@ namespace LearningDiaryMae
 
                         case 4: //finding a topic by id or title
                             var edit = ChooseIdOrTitle("find");
-
-                            string printout = $"Topic title: {diaryDictionary[edit].Title}\n" +
-                                              $"Description: {diaryDictionary[edit].Description}\n" +
-                                              $"Start date: {diaryDictionary[edit].StartLearningDate:d.M.yyyy}\n" +
-                                              $"Last edit date: {diaryDictionary[edit].LastEditDate:d.M.yyyy}\n";
+                            string printout = diaryDictionary[edit].ToStringPrint();
                             Console.WriteLine(printout);
                             break;
 
                         case 5: // editing by id or title
                             edit = ChooseIdOrTitle("edit");
                             Console.WriteLine("Which field would you like to edit?\n" +
-                                              "1) Topic title" +
-                                              "2) Topic description" +
-                                              "3) Source" +
-                                              "4) Date completed");
+                                              "1) Topic title\n" +
+                                              "2) Topic description\n" +
+                                              "3) Source\n" +
+                                              "4) Date completed (DD/MM/YYYY)");
                             int choice = Convert.ToInt32(Console.ReadLine());
-                            Console.WriteLine("Enter the edited field:");
+                            Console.WriteLine("Enter the replacement:");
                             string input = Console.ReadLine();
 
                             if (choice == 1)
@@ -144,11 +117,14 @@ namespace LearningDiaryMae
                                 diaryDictionary[edit].Source = input;
                             else if (choice == 4)
                             {
-                                diaryDictionary[edit].CompletionDate = DateTime.Parse(input);
                                 diaryDictionary[edit].InProgress = false;
+                                diaryDictionary[edit].CompletionDate = DateTime.Parse(input);
+                                diaryDictionary[edit].TimeSpent = diaryDictionary[edit].CalculateTimeSpent();
                             }
                             else
                                 Console.WriteLine("Did you choose a number between 1 and 4?");
+
+                            diaryDictionary[edit].LastEditDate = DateTime.Now;
                             break;
 
                         case 6: // deleting by id or title
@@ -156,9 +132,11 @@ namespace LearningDiaryMae
                             Console.WriteLine(diaryDictionary[edit].Title + " deleted.");
                             diaryDictionary.Remove(edit);
                             break;
+
                         case 7: //exit the app
-                            Console.WriteLine("Exiting app.");
                             exit = true;
+                            File.AppendAllLines(path, diaryDictionary.Select(add => add.Value.ToString()));
+                            Console.WriteLine("Exiting app.");
                             break;
 
                         default:
@@ -175,7 +153,7 @@ namespace LearningDiaryMae
             } while (exit == false);
         }
 
-        //method to add a topic
+        //add a topic
         public static Topic AddTopic(int counter)
         {
             Topic newTopic = new Topic(counter);
@@ -225,26 +203,21 @@ namespace LearningDiaryMae
             return newTopic;
         }
 
-        //prints topics from csv file
+        //prints topics from dictionary
         public static void PrintTopics(string path)
         {
             {
-                Console.WriteLine("A list of your study topics:");
+                Console.WriteLine("A list of your study topics:\n******************************");
 
-                using var streamReader = File.OpenText(path);
-                using var csvReader = new CsvReader(streamReader, csvConfig);
-                while (csvReader.Read())
+                foreach (var item in diaryDictionary)
                 {
-                    string title = csvReader.GetField(1);
-                    string id = csvReader.GetField(0).ToString();
-                    Console.Write("{0,3}", id);
-                    Console.Write("\t");
-                    Console.WriteLine(title);
+                    Console.WriteLine(item.Value.ToStringPrint());
+                    Console.WriteLine("******************************");
                 }
-                Console.WriteLine("\n");
             }
         }
 
+        //choosing topic by id or title, parameter = thing to be done to the topic
         public static int ChooseIdOrTitle(string procedure)
         {
             Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
