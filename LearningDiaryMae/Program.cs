@@ -32,6 +32,7 @@ namespace LearningDiaryMae
                 "Time spent", "Last edit", "In progress"
             };
 
+            //read from file to dictionary via list
             if (File.Exists(path))
             {
                 using (var streamReader = File.OpenText(path))
@@ -89,7 +90,7 @@ namespace LearningDiaryMae
                             break;
 
                         case 3: //printing a list of topics
-                            PrintTopics(path);
+                            PrintTopics();
                             break;
 
                         case 4: //finding a topic by id or title
@@ -215,7 +216,7 @@ namespace LearningDiaryMae
         }
 
         //prints topics from dictionary
-        public static void PrintTopics(string path)
+        public static void PrintTopics()
         {
             {
                 Console.WriteLine("A list of your study topics:\n******************************");
