@@ -31,7 +31,6 @@ namespace LearningDiaryMae
                 timeSpent = CompletionDate - StartLearningDate;
                 timeSpentDouble = timeSpent.TotalDays;
             }
-
             return timeSpentDouble;
         }
 
