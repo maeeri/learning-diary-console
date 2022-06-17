@@ -8,7 +8,7 @@ namespace LearningDiaryMae
         public DateTime Deadline { get; set; }
         public bool Done { get; set; }
 
-        //have to look into this a bit more
+        //have to look into this a bit more, still
         public enum Priority
         {
             Urgent = 1,

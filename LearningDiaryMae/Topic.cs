@@ -34,6 +34,7 @@ namespace LearningDiaryMae
             return timeSpentDouble;
         }
 
+        //reads file to list
         public static Topic FromCsv(string csvLine)
         {
             string[] columns = csvLine.Split(';');
@@ -55,6 +56,7 @@ namespace LearningDiaryMae
         //override the ToString-method in csv-compatible form
         public override string ToString() => $"{Id};{Title};{Description};{EstimatedTimeToMaster};{Source};{StartLearningDate};{CompletionDate};{TimeSpent};{LastEditDate};{InProgress}";
 
+        //printing topics to console
         public string ToStringPrint()
         {
             string print = $"Id: {Id}\n" +

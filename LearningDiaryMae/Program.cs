@@ -10,6 +10,7 @@ namespace LearningDiaryMae
 {
     class Program
     {
+        //declare dictionary and list + csv config outside main, needed by methods below
         static Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
         static List<Topic> diaryList = new List<Topic>();
         static CsvConfiguration csvConfig = new CsvConfiguration(CultureInfo.CurrentCulture)
@@ -32,7 +33,7 @@ namespace LearningDiaryMae
                 "Time spent", "Last edit", "In progress"
             };
 
-            //read from file to dictionary via list
+            //read from file to dictionary via list, if there is something to read
             if (File.Exists(path))
             {
                 using (var streamReader = File.OpenText(path))
@@ -56,6 +57,7 @@ namespace LearningDiaryMae
             string arrayString = String.Join(";", headerArray);
             File.WriteAllText(path, arrayString + "\n");
 
+            //make id (determined by counter) start from last one instead of automatic 0
             counter = diaryDictionary.Count;
 
             string name = "your friendly Learning Diary";
@@ -89,7 +91,7 @@ namespace LearningDiaryMae
 
                             break;
 
-                        case 3: //printing a list of topics
+                        case 3: //printing a list of topics, from dictionary using method
                             PrintTopics();
                             break;
 
@@ -128,7 +130,7 @@ namespace LearningDiaryMae
                             diaryDictionary[edit].LastEditDate = DateTime.Now;
                             break;
 
-                        case 6: // deleting by id or title
+                        case 6: // deleting by id or title, deletes from dictionary, creates temp dict to work out new id's/keys, reference to temp
                             edit = ChooseIdOrTitle("delete");
                             Console.WriteLine(diaryDictionary[edit].Title + " deleted.");
                             diaryDictionary.Remove(edit);
@@ -145,14 +147,14 @@ namespace LearningDiaryMae
                             diaryDictionary = tempDictionary;
                             break;
 
-                        case 7: //exit the app
+                        case 7: //exit the app, write dictionary to file
                             exit = true;
                             File.AppendAllLines(path, diaryDictionary.Select(add => add.Value.ToString()));
                             Console.WriteLine("Exiting app.");
                             break;
 
                         default:
-                            Console.WriteLine("Did you choose a number between 1 and 6?");
+                            Console.WriteLine("Did you choose a number between 1 and 7?");
                             break;
                     }
                 }
@@ -229,7 +231,7 @@ namespace LearningDiaryMae
             }
         }
 
-        //choosing topic by id or title, parameter = thing to be done to the topic
+        //choosing topic by id or title, procedure = thing to be done to the topic
         public static int ChooseIdOrTitle(string procedure)
         {
             Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");

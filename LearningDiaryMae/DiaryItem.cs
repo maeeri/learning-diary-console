@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
+
+//would probably work better as interface?
 namespace LearningDiaryMae
 {
     public class DiaryItem
