@@ -3,9 +3,12 @@ using System.Collections.Generic;
 
 namespace LearningDiaryMae
 {
-    public class Topic: DiaryItem
+    public class Topic: IDiaryItem
     {
         //variables
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
         public double EstimatedTimeToMaster { get; set; }
         public string Source { get; set; }
         public DateTime StartLearningDate { get; set; }

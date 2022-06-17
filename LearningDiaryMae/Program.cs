@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Globalization;
@@ -87,7 +88,47 @@ namespace LearningDiaryMae
                             counter++;
                             break;
 
-                        case 2: //adding a task, to be added at one point or another
+                        case 2: //adding a task, work in progress
+                            Console.WriteLine("Is the task linked to an existing study topic? Yes/no");
+                            string reply = Console.ReadLine();
+                            int id;
+
+                            if (reply.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Console.WriteLine("What is the ID of the topic the task is linked to?");
+                                id = Convert.ToInt32(Console.ReadLine());
+                            }
+
+                            else if (reply.Equals("no", StringComparison.OrdinalIgnoreCase))
+                            {
+                                id = counter;
+                                counter++;
+                            }
+
+                            Console.WriteLine("Task title:");
+                            string taskTitle = Console.ReadLine();
+
+                            Console.WriteLine("Task description: ");
+                            string taskDescription = Console.ReadLine();
+
+                            Console.WriteLine("Do you want to add notes? Yes/no");
+                            reply = Console.ReadLine();
+                            string note = "";
+
+                            if (reply.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                            {
+                                Console.WriteLine("Write your note:");
+                                note = Console.ReadLine();
+                            }
+                            
+
+
+                            Console.WriteLine("What is the deadline? DD/MM/YYYY");
+                            DateTime deadline = Convert.ToDateTime(Console.ReadLine());
+
+                            Console.WriteLine("How urgent is the task? 1) Urgent, 2) Not urgent, 3) Optional");
+                            int priority = Convert.ToInt32(Console.ReadLine());
+
 
                             break;
 
@@ -157,6 +198,7 @@ namespace LearningDiaryMae
                             Console.WriteLine("Did you choose a number between 1 and 7?");
                             break;
                     }
+                    
                 }
                 catch (Exception e) //if all else fails, no crash
                 {

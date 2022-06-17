@@ -2,8 +2,11 @@
 
 namespace LearningDiaryMae
 {
-    public class Task: DiaryItem
+    public class Task: IDiaryItem
     {
+        public int Id { get; set; }
+        public string Title { get; set; }
+        public string Description { get; set; }
         public string Notes { get; set; }
         public DateTime Deadline { get; set; }
         public bool Done { get; set; }
@@ -16,7 +19,7 @@ namespace LearningDiaryMae
             Optional = 3
         }
 
-        public Task(string title, bool done)
+        public Task(int id, string title, string description, string notes,  bool done)
         {
             Title = title;
             Done = done;

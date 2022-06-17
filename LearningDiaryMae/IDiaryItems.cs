@@ -4,7 +4,10 @@ using System.Text;
 
 namespace LearningDiaryMae
 {
-    interface Interface1
+    interface IDiaryItem
     {
+        int Id { get; set; }
+        string Title { get; set; }
+        string Description { get; set; }
     }
 }
