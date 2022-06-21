@@ -121,8 +121,6 @@ namespace LearningDiaryMae
                                 note = Console.ReadLine();
                             }
                             
-
-
                             Console.WriteLine("What is the deadline? DD/MM/YYYY");
                             DateTime deadline = Convert.ToDateTime(Console.ReadLine());
 
@@ -198,7 +196,6 @@ namespace LearningDiaryMae
                             Console.WriteLine("Did you choose a number between 1 and 7?");
                             break;
                     }
-                    
                 }
                 catch (Exception e) //if all else fails, no crash
                 {

@@ -19,7 +19,7 @@ namespace LearningDiaryMae
             Optional = 3
         }
 
-        public Task(int id, string title, string description, string notes,  bool done)
+        public Task(int id, string title, string description, string notes,  bool done, DateTime deadline)
         {
             Title = title;
             Done = done;
