@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LearningDiaryMae
 {
-    public class Topic: IDiaryItem
+    public class Topic
     {
         //variables
         public int Id { get; set; }
@@ -13,7 +13,7 @@ namespace LearningDiaryMae
         public string Source { get; set; }
         public DateTime StartLearningDate { get; set; }
         public bool InProgress { get; set; }
-        public DateTime CompletionDate { get; set; }
+        public DateTime? CompletionDate { get; set; }
         public DateTime LastEditDate { get; set; }
         public double TimeSpent { get; set; }
 
@@ -26,12 +26,12 @@ namespace LearningDiaryMae
             {
                 timeSpent = DateTime.Today - StartLearningDate;
                 timeSpentDouble = timeSpent.TotalDays;
-                CompletionDate = new DateTime(0001, 1, 1);
+                CompletionDate = null;
             }
 
             else
             {
-                timeSpent = CompletionDate - StartLearningDate;
+                timeSpent = (TimeSpan)(CompletionDate - StartLearningDate);
                 timeSpentDouble = timeSpent.TotalDays;
             }
             return timeSpentDouble;

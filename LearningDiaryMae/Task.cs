@@ -2,7 +2,7 @@
 
 namespace LearningDiaryMae
 {
-    public class Task: IDiaryItem
+    public class Task
     {
         public int Id { get; set; }
         public string Title { get; set; }

@@ -37,38 +37,28 @@ namespace LearningDiaryMae.Models
             {
                 entity.ToTable("task");
 
-                entity.Property(e => e.Id)
-                    .ValueGeneratedNever()
-                    .HasColumnName("id");
+                entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.Property(e => e.Deadline)
-                    .HasColumnType("datetime")
-                    .HasColumnName("deadline");
+                entity.Property(e => e.Deadline).HasColumnType("datetime");
 
-                entity.Property(e => e.Descr)
+                entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("descr");
-
-                entity.Property(e => e.Done).HasColumnName("done");
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Notes)
                     .HasMaxLength(600)
-                    .IsUnicode(false)
-                    .HasColumnName("notes");
+                    .IsUnicode(false);
 
-                entity.Property(e => e.Prty)
+                entity.Property(e => e.Priority)
                     .HasMaxLength(60)
-                    .IsUnicode(false)
-                    .HasColumnName("prty");
+                    .IsUnicode(false);
 
                 entity.Property(e => e.Title)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("title");
+                    .IsUnicode(false);
 
-                entity.Property(e => e.TopicId).HasColumnName("topic_id");
+                entity.Property(e => e.TopicId).HasColumnName("Topic_Id");
 
                 entity.HasOne(d => d.Topic)
                     .WithMany(p => p.Tasks)
@@ -80,33 +70,24 @@ namespace LearningDiaryMae.Models
             {
                 entity.ToTable("topic");
 
-                entity.Property(e => e.Id).HasColumnName("id");
+                entity.Property(e => e.CompletionDate).HasColumnType("datetime");
 
-                entity.Property(e => e.Descr)
+                entity.Property(e => e.Description)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("descr");
+                    .IsUnicode(false);
 
-                entity.Property(e => e.InProgress).HasColumnName("in_progress");
+                entity.Property(e => e.LastEditDate).HasColumnType("datetime");
 
-                entity.Property(e => e.SourceOfStudy)
+                entity.Property(e => e.Source)
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("source_of_study");
+                    .IsUnicode(false);
 
-                entity.Property(e => e.StartLearningDate)
-                    .HasColumnType("datetime")
-                    .HasColumnName("start_learning_date");
-
-                entity.Property(e => e.TimeSpent).HasColumnName("time_spent");
-
-                entity.Property(e => e.TimeToMaster).HasColumnName("time_to_master");
+                entity.Property(e => e.StartLearningDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Title)
                     .IsRequired()
                     .HasMaxLength(255)
-                    .IsUnicode(false)
-                    .HasColumnName("title");
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
