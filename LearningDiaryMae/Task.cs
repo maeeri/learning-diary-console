@@ -1,36 +1,35 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace LearningDiaryMae
 {
-    public class Task
+    class Task
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Notes { get; set; }
-        public DateTime Deadline { get; set; }
-        public bool Done { get; set; }
+        public DateTime? Deadline { get; set; }
+        public string Priority { get; set; }
+        public bool? Done { get; set; }
+        public int? Topic { get; set; }
 
-        //have to look into this a bit more, still
-        public enum Priority
+        private string IsDone()
         {
-            Urgent = 1,
-            NotUrgent = 2,
-            Optional = 3
+            return (Done == true) ? "yes" : "no";
         }
 
-        public Task(int id, string title, string description, string notes,  bool done, DateTime deadline)
+        public string ToStringPrint()
         {
-            Title = title;
-            Done = done;
+            string toPrint = ($"ID: {Id}\n" +
+                              $"Title: {Title}\n" +
+                              $"Description: {Description}\n" +
+                              $"Notes: {Notes}\n" +
+                              $"Deadline: {Deadline}\n" +
+                              $"Done: {IsDone()}\n");
+
+            return toPrint;
         }
-
-        public void AddNotes()
-        {
-            Console.WriteLine("Add your note: ");
-            Notes = Console.ReadLine();
-        }
-
-
     }
 }

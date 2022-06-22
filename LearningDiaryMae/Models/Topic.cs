@@ -25,23 +25,24 @@ namespace LearningDiaryMae.Models
 
         public virtual ICollection<Task> Tasks { get; set; }
 
+        //method to calculate time spent on the topic
         public double CalculateTimeSpent()
         {
             TimeSpan timeSpent;
-            int timeSpentInt;
+            double timeSpentDouble;
             if (InProgress == true)
             {
                 timeSpent = (TimeSpan)(DateTime.Today - StartLearningDate);
-                timeSpentInt = (int)timeSpent.TotalDays;
+                timeSpentDouble = timeSpent.TotalDays;
                 CompletionDate = null;
             }
 
             else
             {
                 timeSpent = (TimeSpan)(CompletionDate - StartLearningDate);
-                timeSpentInt = (int)timeSpent.TotalDays;
+                timeSpentDouble = timeSpent.TotalDays;
             }
-            return timeSpentInt;
+            return timeSpentDouble;
         }
 
         //printing topics to console
@@ -51,7 +52,7 @@ namespace LearningDiaryMae.Models
                            $"Title: {Title}\n" +
                            $"Description: {Description}\n" +
                            $"Started: {StartLearningDate:d.M.yyyy}\n" +
-                           $"Last edited: {LastEditDate:d.M.yyyy hh:m:s}\n";
+                           $"Last edited: {LastEditDate:d.M.yyyy h:m:s}\n";
             return print;
         }
     }

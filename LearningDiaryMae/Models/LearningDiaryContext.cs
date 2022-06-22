@@ -25,7 +25,7 @@ namespace LearningDiaryMae.Models
             if (!optionsBuilder.IsConfigured)
             {
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-                optionsBuilder.UseSqlServer("Server=localhost;Database=LearningDiary;Trusted_Connection=True;");
+                optionsBuilder.UseSqlServer("Server=localhost\\;Database=LearningDiary;Trusted_Connection=True;");
             }
         }
 
@@ -36,8 +36,6 @@ namespace LearningDiaryMae.Models
             modelBuilder.Entity<Task>(entity =>
             {
                 entity.ToTable("task");
-
-                entity.Property(e => e.Id).ValueGeneratedNever();
 
                 entity.Property(e => e.Deadline).HasColumnType("datetime");
 
@@ -58,19 +56,15 @@ namespace LearningDiaryMae.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.TopicId).HasColumnName("Topic_Id");
-
-                entity.HasOne(d => d.Topic)
+                entity.HasOne(d => d.TopicNavigation)
                     .WithMany(p => p.Tasks)
-                    .HasForeignKey(d => d.TopicId)
+                    .HasForeignKey(d => d.Topic)
                     .HasConstraintName("FK__task__topic_id__36B12243");
             });
 
             modelBuilder.Entity<Topic>(entity =>
             {
                 entity.ToTable("topic");
-
-                entity.Property(e => e.CompletionDate).HasColumnType("datetime");
 
                 entity.Property(e => e.Description)
                     .HasMaxLength(255)

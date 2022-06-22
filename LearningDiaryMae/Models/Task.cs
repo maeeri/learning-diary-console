@@ -14,8 +14,25 @@ namespace LearningDiaryMae.Models
         public DateTime? Deadline { get; set; }
         public string Priority { get; set; }
         public bool? Done { get; set; }
-        public int? TopicId { get; set; }
+        public int? Topic { get; set; }
 
-        public virtual Topic Topic { get; set; }
+        public virtual Topic TopicNavigation { get; set; }
+
+        private string IsDone()
+        {
+            return (Done == true) ? "yes" : "no";
+        }
+
+        public string ToStringPrint()
+        {
+            string toPrint = ($"ID: {Id}\n" +
+                              $"Title: {Title}\n" +
+                              $"Description: {Description}\n" +
+                              $"Notes: {Notes}\n" +
+                              $"Deadline: {Deadline}\n" +
+                              $"Done: {IsDone()}\n");
+
+            return toPrint;
+        }
     }
 }
