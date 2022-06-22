@@ -7,29 +7,17 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using LearningDiaryMae.Models;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace LearningDiaryMae
 {
     class Program
     {
-        //declare dictionary and list + csv config outside main, needed by methods below
-        static Dictionary<int, Topic> diaryDictionary = new Dictionary<int, Topic>();
-        static List<Models.Topic> diaryList = new List<Models.Topic>();
 
         static void Main(string[] args)
         {
             //declare universal variables
             bool exit = false;
-            int counter = 0;
-
-            using (LearningDiaryContext newContext = new LearningDiaryContext())
-            {
-                var read = newContext.Topics.Select(topic => topic);
-                foreach (var topic in read)
-                {
-                    diaryList.Add(topic);
-                }
-            }
 
             //loop topic editing
             do
@@ -50,26 +38,40 @@ namespace LearningDiaryMae
                     switch (answer)
                     {
                         case 1: //adding a topic to dictionary with method
-                            Topic newTopic = AddTopic(counter);
-                            diaryDictionary.Add(counter, newTopic);
-                            counter++;
+                            Models.Topic newTopic = AddTopic();
+                            using (LearningDiaryContext newContext = new LearningDiaryContext())
+                            {
+                                Models.Topic newTopic2 = new Models.Topic()
+                                {
+                                    Title = newTopic.Title,
+                                    Description = newTopic.Description,
+                                    Source = newTopic.Source,
+                                    TimeToMaster = newTopic.TimeToMaster,
+                                    StartLearningDate = newTopic.StartLearningDate,
+                                    CompletionDate = (DateTime?)newTopic.CompletionDate,
+                                    LastEditDate = newTopic.LastEditDate,
+                                    InProgress = newTopic.InProgress
+                                };
+                                newContext.Topics.Add(newTopic2);
+                                newContext.SaveChanges();
+                            };
+
                             break;
 
                         case 2: //adding a task, work in progress
                             Console.WriteLine("Is the task linked to an existing study topic? Yes/no");
                             string reply = Console.ReadLine();
-                            int id;
+                            int? topicId;
 
                             if (reply.Equals("yes", StringComparison.OrdinalIgnoreCase))
                             {
                                 Console.WriteLine("What is the ID of the topic the task is linked to?");
-                                id = Convert.ToInt32(Console.ReadLine());
+                                topicId = Convert.ToInt32(Console.ReadLine());
                             }
 
                             else if (reply.Equals("no", StringComparison.OrdinalIgnoreCase))
                             {
-                                id = counter;
-                                counter++;
+                                topicId = null;
                             }
 
                             Console.WriteLine("Task title:");
@@ -96,14 +98,13 @@ namespace LearningDiaryMae
 
                             break;
 
-                        case 3: //printing a list of topics, from dictionary using method
+                        case 3: //printing a list of topics, from database using method
                             PrintTopics();
                             break;
 
                         case 4: //finding a topic by id or title
                             var edit = ChooseIdOrTitle("find");
-                            string printout = diaryDictionary[edit].ToStringPrint();
-                            Console.WriteLine(printout);
+                            Console.WriteLine(edit.ToStringPrint());
                             break;
 
                         case 5: // editing by id or title
@@ -117,65 +118,47 @@ namespace LearningDiaryMae
                             Console.WriteLine("Enter the replacement:");
                             string input = Console.ReadLine();
 
-                            if (choice == 1)
-                                diaryDictionary[edit].Title = input;
-                            else if (choice == 2)
-                                diaryDictionary[edit].Description = input;
-                            else if (choice == 3)
-                                diaryDictionary[edit].Source = input;
-                            else if (choice == 4)
+                            using (LearningDiaryContext newContext = new LearningDiaryContext())
                             {
-                                diaryDictionary[edit].InProgress = false;
-                                diaryDictionary[edit].CompletionDate = DateTime.Parse(input);
-                                diaryDictionary[edit].TimeSpent = diaryDictionary[edit].CalculateTimeSpent();
-                            }
-                            else
-                                Console.WriteLine("Did you choose a number between 1 and 4?");
+                                switch (choice)
+                                {
+                                    case 1:
+                                        edit.Title = input;
+                                        break;
 
-                            diaryDictionary[edit].LastEditDate = DateTime.Now;
+                                    case 2:
+                                        edit.Description = input;
+                                        break;
+
+                                    case 3:
+                                        edit.Source = input;
+                                        break;
+
+                                    case 4:
+                                        DateTime input2 = Convert.ToDateTime(input);
+                                        edit.CompletionDate = input2;
+                                        break;
+
+                                    default:
+                                        Console.WriteLine("Did you choose a number between 1 and 4?");
+                                        break;
+                                }
+                                newContext.SaveChanges();
+                            }
                             break;
 
-                        case 6: // deleting by id or title, deletes from dictionary, creates temp dict to work out new id's/keys, reference to temp
+                        case 6: // deleting by id or title
                             edit = ChooseIdOrTitle("delete");
-                            Console.WriteLine(diaryDictionary[edit].Title + " deleted.");
-                            diaryDictionary.Remove(edit);
-                            Dictionary<int, Topic> tempDictionary = new Dictionary<int, Topic>();
-
-                            counter = 0;
-                            foreach (var item in diaryDictionary)
+                            using (LearningDiaryContext newContext = new LearningDiaryContext())
                             {
-                                tempDictionary[counter] = diaryDictionary[item.Key];
-                                tempDictionary[counter].Id = counter;
-                                counter++;
+                                newContext.Remove(edit);
+                                newContext.SaveChanges();
                             }
-
-                            diaryDictionary.Clear();
-                            diaryDictionary = tempDictionary;
                             break;
 
-                        case 7: //exit the app, write dictionary to database
+                        case 7: //exit the app, write dictionary to database from list
                             exit = true;
                             Console.WriteLine("Exiting app.");
-                            foreach (var item in diaryDictionary)
-                            {
-                                using (LearningDiaryContext newContext = new LearningDiaryContext())
-                                {
-                                    Models.Topic newerTopic = new Models.Topic()
-                                    {
-                                        Id = item.Value.Id,
-                                        Title = item.Value.Title,
-                                        Description = item.Value.Description,
-                                        Source = item.Value.Source,
-                                        TimeToMaster = (int?)item.Value.EstimatedTimeToMaster,
-                                        StartLearningDate = item.Value.StartLearningDate,
-                                        CompletionDate = (DateTime?)item.Value.CompletionDate,
-                                        LastEditDate = item.Value.LastEditDate,
-                                        InProgress = item.Value.InProgress
-                                    };
-                                    newContext.Topics.Add(newerTopic);
-                                    newContext.SaveChanges();
-                                }
-                            };
                             break;
 
                         default:
@@ -192,54 +175,54 @@ namespace LearningDiaryMae
         }
 
         //add a topic
-        public static Topic AddTopic(int counter)
+        public static Models.Topic AddTopic()
         {
-            Topic newTopic = new Topic(counter);
+            Models.Topic newTopic = new Models.Topic();
 
-            Console.WriteLine("Title: ");
-            newTopic.Title = Console.ReadLine();
+                Console.WriteLine("Title: ");
+                newTopic.Title = Console.ReadLine();
 
-            Console.WriteLine("Describe the area of study: ");
-            newTopic.Description = Console.ReadLine();
+                Console.WriteLine("Describe the area of study: ");
+                newTopic.Description = Console.ReadLine();
 
-            Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
-            newTopic.EstimatedTimeToMaster = Convert.ToDouble(Console.ReadLine());
+                Console.WriteLine("How much time (hours) do you estimate you need for mastering the topic?");
+                newTopic.TimeToMaster = Convert.ToInt32(Console.ReadLine());
 
-            Console.WriteLine("Did you use a source? Yes/no");
-            string input = Console.ReadLine();
+                Console.WriteLine("Did you use a source? Yes/no");
+                string input = Console.ReadLine();
 
-            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
-            {
-                Console.WriteLine("Which source did you use?");
-                newTopic.Source = Console.ReadLine();
-            }
+                if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Which source did you use?");
+                    newTopic.Source = Console.ReadLine();
+                }
 
-            Console.WriteLine("When did you start studying? DD/MM/YYYY");
-            newTopic.StartLearningDate = Convert.ToDateTime(Console.ReadLine());
+                Console.WriteLine("When did you start studying? DD/MM/YYYY");
+                newTopic.StartLearningDate = Convert.ToDateTime(Console.ReadLine());
 
-            Console.WriteLine("Is your study complete? Yes/no");
-            input = Console.ReadLine();
+                Console.WriteLine("Is your study complete? Yes/no");
+                input = Console.ReadLine();
 
-            if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
-            {
-                newTopic.InProgress = false;
-            }
+                if (input.Equals("yes", StringComparison.OrdinalIgnoreCase))
+                {
+                    newTopic.InProgress = false;
+                }
 
-            else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
-            {
-                newTopic.InProgress = true;
-            }
+                else if (input.Equals("no", StringComparison.OrdinalIgnoreCase))
+                {
+                    newTopic.InProgress = true;
+                }
 
-            if (newTopic.InProgress == false)
-            {
-                Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
-                newTopic.CompletionDate = Convert.ToDateTime(Console.ReadLine());
-            }
+                if (newTopic.InProgress == false)
+                {
+                    Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
+                    newTopic.CompletionDate = Convert.ToDateTime(Console.ReadLine());
+                }
 
-            newTopic.TimeSpent = newTopic.CalculateTimeSpent();
-            newTopic.LastEditDate = DateTime.Now;
+                newTopic.TimeSpent = (int?)newTopic.CalculateTimeSpent();
+                newTopic.LastEditDate = DateTime.Now;
 
-            return newTopic;
+                return newTopic;
         }
 
         //prints topics from dictionary
@@ -248,37 +231,49 @@ namespace LearningDiaryMae
             {
                 Console.WriteLine("A list of your study topics:\n******************************");
 
-                foreach (var item in diaryDictionary)
+                using (LearningDiaryContext newContext = new LearningDiaryContext())
                 {
-                    Console.WriteLine(item.Value.ToStringPrint());
-                    Console.WriteLine("******************************");
+                    var read = newContext.Topics.Select(topic => topic);
+                    foreach (var topic in read)
+                    {
+                        Console.WriteLine($"Id: {topic.Id}\n" +
+                                          $"Title: {topic.Title}\n" +
+                                          $"Description: {topic.Description}\n" +
+                                          $"Started: {topic.StartLearningDate:d.M.yyyy}\n" +
+                                          $"Last edited: {topic.LastEditDate:d.M.yyyy hh:m:s}\n");
+                        Console.WriteLine("******************************");
+                    }
                 }
             }
         }
 
         //choosing topic by id or title, procedure = thing to be done to the topic
-        public static int ChooseIdOrTitle(string procedure)
+        public static Models.Topic ChooseIdOrTitle(string procedure)
         {
             Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
             int input = Convert.ToInt32(Console.ReadLine());
-            int edit = 0;
+            Models.Topic edit = new Models.Topic();
 
-            //finds the Key of the Topic to be edited
+            //finds the topic to be modified
             if (input == 1)
             {
                 Console.WriteLine($"Which topic would you like to {procedure}?");
                 int idOption = Convert.ToInt32(Console.ReadLine());
-                edit = idOption;
+                using (LearningDiaryContext connection = new LearningDiaryContext())
+                {
+                    var option = connection.Topics.Where(x => x.Id == idOption).Select(x => x).FirstOrDefault();
+                    edit = option;
+                }
             }
 
             else if (input == 2)
             {
                 Console.WriteLine($"Which topic would you like to {procedure}?");
                 string titleOption = Console.ReadLine();
-                foreach (var value in diaryDictionary)
+                using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    if (titleOption.Equals(value.Value.Title, StringComparison.OrdinalIgnoreCase))
-                        edit = value.Key;
+                    var option = connection.Topics.Where(x=> x.Title == titleOption).Select(x => x).FirstOrDefault();
+                    edit = option;
                 }
             }
             return edit;

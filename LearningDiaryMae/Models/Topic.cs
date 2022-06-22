@@ -24,5 +24,35 @@ namespace LearningDiaryMae.Models
         public DateTime? CompletionDate { get; set; }
 
         public virtual ICollection<Task> Tasks { get; set; }
+
+        public double CalculateTimeSpent()
+        {
+            TimeSpan timeSpent;
+            int timeSpentInt;
+            if (InProgress == true)
+            {
+                timeSpent = (TimeSpan)(DateTime.Today - StartLearningDate);
+                timeSpentInt = (int)timeSpent.TotalDays;
+                CompletionDate = null;
+            }
+
+            else
+            {
+                timeSpent = (TimeSpan)(CompletionDate - StartLearningDate);
+                timeSpentInt = (int)timeSpent.TotalDays;
+            }
+            return timeSpentInt;
+        }
+
+        //printing topics to console
+        public string ToStringPrint()
+        {
+            string print = $"Id: {Id}\n" +
+                           $"Title: {Title}\n" +
+                           $"Description: {Description}\n" +
+                           $"Started: {StartLearningDate:d.M.yyyy}\n" +
+                           $"Last edited: {LastEditDate:d.M.yyyy hh:m:s}\n";
+            return print;
+        }
     }
 }
