@@ -30,7 +30,7 @@ namespace LearningDiaryMae.Models
                               $"Description: {Description}\n" +
                               $"Notes: {Notes}\n" +
                               $"Deadline: {Deadline}\n" +
-                              $"Done: {IsDone()}\n");
+                              $"Done: {IsDone()}");
 
             return toPrint;
         }

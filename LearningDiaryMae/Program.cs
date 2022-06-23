@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using CsvHelper;
 using CsvHelper.Configuration;
@@ -54,6 +55,7 @@ namespace LearningDiaryMae
                                           "3. Find a topic by id or title\n" +
                                           "4. Edit a topic\n" +
                                           "5. Delete a topic\n" +
+                                          "6. Get tasks related to a topic\n" +
                                           "6. Exit the app");
                         int answer2 = Convert.ToInt32(Console.ReadLine());
 
@@ -83,12 +85,12 @@ namespace LearningDiaryMae
                                 PrintTopics();
                                 break;
 
-                            case 4: //finding a topic by id or title
+                            case 3: //finding a topic by id or title
                                 var edit = ChooseIdOrTitle("find");
                                 Console.WriteLine(edit.ToStringPrint());
                                 break;
 
-                            case 5: // editing by id or title
+                            case 4: // editing by id or title
                                 edit = ChooseIdOrTitle("edit");
                                 Console.WriteLine("Which field would you like to edit?\n" +
                                                   "1) Topic title\n" +
@@ -128,12 +130,29 @@ namespace LearningDiaryMae
                                 }
                                 break;
 
-                            case 6: // deleting by id or title
+                            case 5: // deleting by id or title
                                 edit = ChooseIdOrTitle("delete");
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
                                     newContext.Remove(edit);
                                     newContext.SaveChanges();
+                                }
+                                break;
+
+                            case 6:
+                                Console.WriteLine("What is the id of the topic you want to get the tasks of?");
+                                int answer3 = Convert.ToInt32(Console.ReadLine());
+
+                                using (LearningDiaryContext newContext = new LearningDiaryContext())
+                                {
+                                    var something = newContext.Tasks.Where(task => task.Topic == answer3);
+                                    Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+                                    foreach (var item in something)
+                                    {
+                                        Console.WriteLine(item.ToStringPrint());
+                                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                                    }
                                 }
                                 break;
 
@@ -157,7 +176,7 @@ namespace LearningDiaryMae
                                           "3. Find a task by id or title\n" +
                                           "4. Edit a task\n" +
                                           "5. Delete a task\n" +
-                                          "6. Exit the app");
+                                          "7. Exit the app");
                         int answer3 = Convert.ToInt32(Console.ReadLine());
 
                         switch (answer3)
@@ -250,7 +269,8 @@ namespace LearningDiaryMae
                                                   "1) Task title\n" +
                                                   "2) Task description\n" +
                                                   "3) Deadline(DD/MM/YYYY)\n" +
-                                                  "4) Task status (done/not done)");
+                                                  "4) Task status (done/not done)\n" +
+                                                  "5) Add a note");
                                 int choice = Convert.ToInt32(Console.ReadLine());
 
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
@@ -279,6 +299,11 @@ namespace LearningDiaryMae
                                                 edit2.Done = true;
                                             else if (input4.Equals("no"))
                                                 edit2.Done = false;
+                                            break;
+
+                                        case 5:
+                                            Console.WriteLine("Enter the new note:");
+                                            edit2.Notes += Console.ReadLine();
                                             break;
 
                                         default:
@@ -378,7 +403,7 @@ namespace LearningDiaryMae
         public static void PrintTopics()
         {
             {
-                Console.WriteLine("A list of your study topics:\n******************************");
+                Console.WriteLine("A list of your study topics:\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                 {
@@ -390,7 +415,7 @@ namespace LearningDiaryMae
                                           $"Description: {topic.Description}\n" +
                                           $"Start date: {topic.StartLearningDate: d.M.yyyy}\n" +
                                           $"Last edit date: {topic.LastEditDate: d.M.yyyy}");
-                        Console.WriteLine("******************************");
+                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                     }
                 }
             }
@@ -432,7 +457,7 @@ namespace LearningDiaryMae
         public static void PrintTasks()
         {
             {
-                Console.WriteLine("A list of your tasks:\n******************************");
+                Console.WriteLine("A list of your tasks:\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                 {
@@ -440,7 +465,7 @@ namespace LearningDiaryMae
                     foreach (var task in read)
                     {
                         Console.WriteLine(task.ToStringPrint());
-                        Console.WriteLine("******************************");
+                        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                     }
                 }
             }
