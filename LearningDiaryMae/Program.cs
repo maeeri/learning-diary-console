@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Linq;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Threading;
-using CsvHelper;
-using CsvHelper.Configuration;
 using LearningDiaryMae.Models;
-using Microsoft.EntityFrameworkCore.Storage;
-using ClassLibraryDateMethods;
-using Microsoft.EntityFrameworkCore;
+using static ClassLibraryDateMethods.DateMethods;
 
 namespace LearningDiaryMae
 {
@@ -47,9 +38,9 @@ namespace LearningDiaryMae
                                       "1. Work with topics\n" +
                                       "2. Work with tasks\n" +
                                       "3. Exit the app");
-                    int answer = ValidateIntInput(Console.ReadLine());
+                    int mainMenuInput = ValidateIntInput(Console.ReadLine());
 
-                    if (answer == 1)
+                    if (mainMenuInput == 1)
                     {
                         //ask what the user wants to do and go to switch
                         Console.WriteLine("What do you want to do?\n" +
@@ -60,16 +51,18 @@ namespace LearningDiaryMae
                                           "5. Delete a topic\n" +
                                           "6. Get tasks related to a topic\n" +
                                           "7. Exit the app");
-                        int answer2 = ValidateIntInput(Console.ReadLine());
+                        int topicMenuInput = ValidateIntInput(Console.ReadLine());
 
-                        switch (answer2)
+
+                        //what to do with topics
+                        switch (topicMenuInput)
                         {
                             case 1: //adding a topic to dictionary with method
                                 Models.Topic newTopic = AddTopic();
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
                                     newContext.Topics.Add(newTopic);
-                                    newContext.SaveChangesAsync();
+                                    newContext.SaveChanges();
                                 };
                                 break;
 
@@ -78,66 +71,68 @@ namespace LearningDiaryMae
                                 break;
 
                             case 3: //finding a topic by id or title
-                                var edit = ChooseIdOrTitle("find");
-                                Console.WriteLine(edit.ToStringPrint());
+                                var editTopic = ChooseIdOrTitle("find");
+                                Console.WriteLine(editTopic.ToStringPrint());
                                 break;
 
-                            case 4: // editing by id or title
-                                edit = ChooseIdOrTitle("edit");
-                                Console.WriteLine("Which field would you like to edit?\n" +
-                                                  "1) Topic title\n" +
-                                                  "2) Topic description\n" +
-                                                  "3) Source\n" +
-                                                  "4) Date completed (DD/MM/YYYY)");
-                                int choice = ValidateIntInput(Console.ReadLine());
-                                Console.WriteLine("Enter the new field:");
-                                string input = Console.ReadLine();
-
+                            case 4: //editing by id or title
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    switch (choice)
+                                    editTopic = ChooseIdOrTitle("edit");
+                                    Console.WriteLine("Which field would you like to edit?\n" +
+                                                      "1) Topic title\n" +
+                                                      "2) Topic description\n" +
+                                                      "3) Source\n" +
+                                                      "4) Date completed (DD/MM/YYYY)");
+                                    var topicFieldChoice = ValidateIntInput(Console.ReadLine());
+                                    Console.WriteLine("Enter the new field:");
+                                    var inputTopicField = Console.ReadLine();
+                                    editTopic.LastEditDate = DateTime.Now;
+
+                                    switch (topicFieldChoice)
                                     {
                                         case 1:
-                                            edit.Title = input;
+                                            editTopic.Title = inputTopicField;
                                             break;
 
                                         case 2:
-                                            edit.Description = input;
+                                            editTopic.Description = inputTopicField;
                                             break;
 
                                         case 3:
-                                            edit.Source = input;
+                                            editTopic.Source = inputTopicField;
                                             break;
 
                                         case 4:
-                                            DateTime input2 = Convert.ToDateTime(input);
-                                            edit.CompletionDate = input2;
+                                            var topicCompletionDate = Convert.ToDateTime(inputTopicField);
+                                            editTopic.CompletionDate = topicCompletionDate;
                                             break;
 
                                         default:
                                             Console.WriteLine("Did you choose a number between 1 and 4?");
                                             break;
                                     }
-                                    newContext.SaveChangesAsync();
+
+                                    newContext.SaveChanges();
                                 }
                                 break;
 
                             case 5: // deleting by id or title
-                                edit = ChooseIdOrTitle("delete");
+                                editTopic = ChooseIdOrTitle("delete");
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    newContext.Remove(edit);
-                                    newContext.SaveChangesAsync();
+                                    newContext.Remove(editTopic);
+                                    newContext.SaveChanges();
                                 }
                                 break;
 
-                            case 6:
+                            case 6: //print tasks related to a specific topic
                                 Console.WriteLine("What is the id of the topic you want to get the tasks of?");
-                                int answer3 = ValidateIntInput(Console.ReadLine());
+                                int topicId = ValidateIntInput(Console.ReadLine());
 
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    var something = newContext.Tasks.Where(task => task.Topic == answer3);
+                                    var something = newContext.Tasks.Where(task => task.Topic == topicId);
                                     Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                                     foreach (var item in something)
@@ -148,7 +143,7 @@ namespace LearningDiaryMae
                                 }
                                 break;
 
-                            case 7: //exit the app, write dictionary to database from list
+                            case 7: //exit the app
                                 exit = true;
                                 Console.WriteLine("Exiting app.");
                                 break;
@@ -160,7 +155,7 @@ namespace LearningDiaryMae
                     }
 
                     //work with tasks
-                    else if (answer == 2)
+                    else if (mainMenuInput == 2)
                     {
                         Console.WriteLine("What do you want to do?\n" +
                                           "1. Add a task\n" +
@@ -169,16 +164,16 @@ namespace LearningDiaryMae
                                           "4. Edit a task\n" +
                                           "5. Delete a task\n" +
                                           "6. Exit the app");
-                        int answer3 = ValidateIntInput(Console.ReadLine());
+                        int taskMenuChoice = ValidateIntInput(Console.ReadLine());
 
-                        switch (answer3)
+                        switch (taskMenuChoice)
                         {
                             case 1: //adding a task
                                 Task newTask = AddTask();
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
                                     newContext.Add(newTask);
-                                    newContext.SaveChangesAsync();
+                                    newContext.SaveChanges();
                                 }
                                 break;
 
@@ -187,12 +182,12 @@ namespace LearningDiaryMae
                                 break;
 
                             case 3: //finding a task by id or title
-                                Models.Task edit2 = ChooseTaskIdOrTitle("find");
-                                Console.WriteLine(edit2.ToStringPrint());
+                                Models.Task editTask = ChooseTaskIdOrTitle("find");
+                                Console.WriteLine(editTask.ToStringPrint());
                                 break;
 
-                            case 4: // editing by id or title
-                                edit2 = ChooseTaskIdOrTitle("edit");
+                            case 4: //editing by id or title
+                                editTask = ChooseTaskIdOrTitle("edit");
                                 Console.WriteLine("Which field would you like to edit?\n" +
                                                   "1) Task title\n" +
                                                   "2) Task description\n" +
@@ -200,53 +195,54 @@ namespace LearningDiaryMae
                                                   "4) Task status (done/not done)\n" +
                                                   "5) Task priority\n" +
                                                   "6) Add a note");
-                                int choice = ValidateIntInput(Console.ReadLine());
+                                int taskEditField = ValidateIntInput(Console.ReadLine());
 
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    switch (choice)
+                                    switch (taskEditField)
                                     {
                                         case 1:
                                             Console.WriteLine("Enter the new title:");
-                                            edit2.Title = Console.ReadLine();
+                                            editTask.Title = Console.ReadLine();
                                             break;
 
                                         case 2:
                                             Console.WriteLine("Enter the new description:");
-                                            edit2.Description = Console.ReadLine();
+                                            editTask.Description = Console.ReadLine();
                                             break;
 
                                         case 3:
                                             Console.WriteLine("Enter the new deadline:");
-                                            edit2.Deadline = ValidateDateTimeInput(Console.ReadLine());
+                                            editTask.Deadline = ValidateDateTimeInput(Console.ReadLine());
                                             break;
 
                                         case 4:
                                             Console.WriteLine("Is the task done? Yes/no");
                                             string input5 = Console.ReadLine().ToLower();
                                             if (input5.Equals("yes"))
-                                                edit2.Done = true;
+                                                editTask.Done = true;
                                             else if (input5.Equals("no"))
-                                                edit2.Done = false;
+                                                editTask.Done = false;
                                             break;
 
+                                        //set task priority
                                         case 5:
                                             Console.WriteLine("How urgent is the task? 1) Urgent, 2) Not urgent, 3) Optional");
-                                            int answer6 = ValidateIntInput(Console.ReadLine());
-                                            switch (answer6)
+                                            int priorityInput = ValidateIntInput(Console.ReadLine());
+                                            switch (priorityInput)
                                             {
                                                 case 1:
-                                                    edit2.Priority = "Urgent";
+                                                    editTask.Priority = "Urgent";
                                                     break;
                                                 case 2:
-                                                    edit2.Priority = "Not urgent";
+                                                    editTask.Priority = "Not urgent";
                                                     break;
                                                 case 3:
-                                                    edit2.Priority = "Optional";
+                                                    editTask.Priority = "Optional";
                                                     break;
                                                 default:
-                                                    Console.WriteLine("Did you choose a number between 1 and 3?");
-                                                    edit2.Priority = null;
+                                                    Console.WriteLine("No task priority set.");
+                                                    editTask.Priority = null;
                                                     break;
                                             }
                                             break;
@@ -255,23 +251,23 @@ namespace LearningDiaryMae
                                         case 6:
                                             Console.WriteLine("Enter the new note:");
                                             string newNote = Console.ReadLine();
-                                            edit2.Notes = edit2.Notes + "\n" + newNote;
+                                            editTask.Notes = editTask.Notes + "\n" + newNote;
                                             break;
 
                                         default:
                                             Console.WriteLine("Did you choose a number between 1 and 4?");
                                             break;
                                     }
-                                    newContext.SaveChangesAsync();
+                                    newContext.SaveChanges();
                                 }
                                 break;
 
                             case 5: // deleting by id or title
-                                edit2 = ChooseTaskIdOrTitle("delete");
+                                editTask = ChooseTaskIdOrTitle("delete");
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    newContext.Remove(edit2);
-                                    newContext.SaveChangesAsync();
+                                    newContext.Remove(editTask);
+                                    newContext.SaveChanges();
                                 }
                                 break;
 
@@ -285,7 +281,7 @@ namespace LearningDiaryMae
                                 break;
                         }
                     }
-                    else if (answer == 3)
+                    else if (mainMenuInput == 3)
                     {
                         exit = true;
                         Console.WriteLine("Exiting app.");
@@ -315,7 +311,6 @@ namespace LearningDiaryMae
 
             Console.WriteLine("How much time (days) do you estimate you need for mastering the topic?");
             int timeToMaster = ValidateIntInput(Console.ReadLine());
-            
 
             Console.WriteLine("Did you use a source? Yes/no");
             bool usedSource = ValidateYesOrNoInput(Console.ReadLine());
@@ -335,11 +330,36 @@ namespace LearningDiaryMae
             bool inProgress = true;
 
             DateTime? completionDate = null;
+
+            //if study is complete, ask for end date. If end date is in the future, ask whether study is complete again
             if (finished)
             {
-                inProgress = false;
-                Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
-                completionDate = Convert.ToDateTime(Console.ReadLine());
+                while (true)
+                {
+                    try
+                    {
+                        Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
+                        completionDate = ValidateDateTimeInput(Console.ReadLine());
+                        bool isFutureDate = FutureDate((DateTime)completionDate);
+
+                        if (!isFutureDate)
+                            break;
+                        else
+                        {
+                            Console.WriteLine("The date you gave seems to be in the future. Is your study finished? Yes/no");
+                            bool studyComplete = ValidateYesOrNoInput(Console.ReadLine());
+
+                            if (studyComplete)
+                                continue;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        continue;
+                    }
+                    inProgress = false;
+                    break;
+                }
             }
 
             DateTime lastEditDate = DateTime.Now;
@@ -353,8 +373,7 @@ namespace LearningDiaryMae
                 StartLearningDate = startLearningDate,
                 CompletionDate = (DateTime?)completionDate,
                 LastEditDate = lastEditDate,
-                InProgress = inProgress,
-                
+                InProgress = inProgress
             };
             newTopic.TimeSpent = (int?)newTopic.CalculateTimeSpent();
             return newTopic;
@@ -482,7 +501,6 @@ namespace LearningDiaryMae
             Console.WriteLine("Task description: ");
             string taskDescription = Console.ReadLine();
 
-
             //doesn't work yet
             Console.WriteLine("Do you want to add notes? Yes/no");
             bool validReply = ValidateYesOrNoInput(Console.ReadLine());
@@ -569,6 +587,7 @@ namespace LearningDiaryMae
                 {
                     Console.WriteLine("Please give a date (DD/MM/YYYY):");
                     input = Console.ReadLine();
+                    continue;
                 }
                 break;
             }

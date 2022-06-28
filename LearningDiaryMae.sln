@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32428.217
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningDiaryMae", "LearningDiaryMae\LearningDiaryMae.csproj", "{35EA4426-95A4-4D1B-87DD-B8C76682B728}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LearningDiaryMae", "LearningDiaryMae\LearningDiaryMae.csproj", "{35EA4426-95A4-4D1B-87DD-B8C76682B728}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ClassLibraryDateMethods", "..\ClassLibraryDateMethods\ClassLibraryDateMethods.csproj", "{1FF90DC1-D94D-4137-AE59-8C6DCB599AA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{35EA4426-95A4-4D1B-87DD-B8C76682B728}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35EA4426-95A4-4D1B-87DD-B8C76682B728}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35EA4426-95A4-4D1B-87DD-B8C76682B728}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FF90DC1-D94D-4137-AE59-8C6DCB599AA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FF90DC1-D94D-4137-AE59-8C6DCB599AA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FF90DC1-D94D-4137-AE59-8C6DCB599AA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FF90DC1-D94D-4137-AE59-8C6DCB599AA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
