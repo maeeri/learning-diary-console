@@ -10,6 +10,7 @@ using CsvHelper;
 using CsvHelper.Configuration;
 using LearningDiaryMae.Models;
 using Microsoft.EntityFrameworkCore.Storage;
+using ClassLibraryDateMethods;
 
 namespace LearningDiaryMae
 {
@@ -56,7 +57,7 @@ namespace LearningDiaryMae
                                           "4. Edit a topic\n" +
                                           "5. Delete a topic\n" +
                                           "6. Get tasks related to a topic\n" +
-                                          "6. Exit the app");
+                                          "7. Exit the app");
                         int answer2 = Convert.ToInt32(Console.ReadLine());
 
                         switch (answer2)
@@ -77,7 +78,7 @@ namespace LearningDiaryMae
                                         InProgress = newTopic.InProgress
                                     };
                                     newContext.Topics.Add(newTopic2);
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 };
                                 break;
 
@@ -126,7 +127,7 @@ namespace LearningDiaryMae
                                             Console.WriteLine("Did you choose a number between 1 and 4?");
                                             break;
                                     }
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 }
                                 break;
 
@@ -135,7 +136,7 @@ namespace LearningDiaryMae
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
                                     newContext.Remove(edit);
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 }
                                 break;
 
@@ -250,7 +251,7 @@ namespace LearningDiaryMae
                                         Done = done
                                     };
                                     newContext.Add(newTask);
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 }
                                 break;
 
@@ -303,14 +304,15 @@ namespace LearningDiaryMae
 
                                         case 5:
                                             Console.WriteLine("Enter the new note:");
-                                            edit2.Notes += Console.ReadLine();
+                                            string newNote = Console.ReadLine();
+                                            edit2.Notes += "\n" + newNote;
                                             break;
 
                                         default:
                                             Console.WriteLine("Did you choose a number between 1 and 4?");
                                             break;
                                     }
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 }
                                 break;
 
@@ -319,7 +321,7 @@ namespace LearningDiaryMae
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
                                     newContext.Remove(edit2);
-                                    newContext.SaveChanges();
+                                    newContext.SaveChangesAsync();
                                 }
                                 break;
 
@@ -387,6 +389,7 @@ namespace LearningDiaryMae
                 newTopic.InProgress = true;
             }
 
+            //change!!!
             if (newTopic.InProgress == false)
             {
                 Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
@@ -471,10 +474,10 @@ namespace LearningDiaryMae
             }
         }
 
-        //choosing topic by id or title, procedure = thing to be done to the topic
+        //choosing topic by id or title, procedure = thing to be done to the task
         public static Models.Task ChooseTaskIdOrTitle(string procedure)
         {
-            Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
+            Console.WriteLine("Would you like to select the task by 1) ID or 2) title?");
             int input = Convert.ToInt32(Console.ReadLine());
             Models.Task edit = new Models.Task();
 

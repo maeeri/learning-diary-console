@@ -14,4 +14,10 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="ClassLibraryDateMethods">
+      <HintPath>..\..\ClassLibraryDateMethods\bin\Debug\netcoreapp3.1\ClassLibraryDateMethods.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
