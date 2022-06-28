@@ -43,9 +43,7 @@ namespace LearningDiaryMae.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Notes)
-                    .HasMaxLength(600)
-                    .IsUnicode(false);
+                entity.Property(e => e.Notes).IsUnicode(false);
 
                 entity.Property(e => e.Priority)
                     .HasMaxLength(60)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace LearningDiaryMae
 {
-    public class Topic
+    public class TopicOriginal
     {
         //variables
         public int Id { get; set; }
@@ -24,7 +24,7 @@ namespace LearningDiaryMae
             double timeSpentDouble;
             if (InProgress == true)
             {
-                timeSpent = DateTime.Today - StartLearningDate;
+                timeSpent = (TimeSpan)(DateTime.Today - StartLearningDate);
                 timeSpentDouble = timeSpent.TotalDays;
                 CompletionDate = null;
             }
@@ -47,8 +47,5 @@ namespace LearningDiaryMae
                            $"Last edited: {LastEditDate:d.M.yyyy h:m:s}\n";
             return print;
         }
-
-        //constructor without id
-        public Topic() { }
     }
 }
