@@ -199,6 +199,8 @@ namespace LearningDiaryMae
                                 Console.WriteLine("Task description: ");
                                 string taskDescription = Console.ReadLine();
 
+
+                                //doesn't work yet
                                 Console.WriteLine("Do you want to add notes? Yes/no");
                                 reply = Console.ReadLine();
                                 string note = "";
@@ -302,6 +304,7 @@ namespace LearningDiaryMae
                                                 edit2.Done = false;
                                             break;
 
+                                        //doesn't work yet
                                         case 5:
                                             Console.WriteLine("Enter the new note:");
                                             string newNote = Console.ReadLine();
