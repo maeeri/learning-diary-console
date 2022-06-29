@@ -596,7 +596,7 @@ namespace LearningDiaryMae
         public static void GiveCompletionDate(out bool inProgress, out DateTime? completionDate)
         {
             completionDate = new DateTime?();
-            inProgress = true;
+            inProgress = false;
             while (true)
             {
                 try
@@ -613,14 +613,20 @@ namespace LearningDiaryMae
                         if (studyComplete)
                         {
                             inProgress = false;
+                            continue;
                         }
-                        continue;
+                        else
+                        {
+                            inProgress = true;
+                            break;
+                        }
                     }
                 }
                 catch (Exception e)
                 {
                     continue;
                 }
+                break;
             }
         }
     }
