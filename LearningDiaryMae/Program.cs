@@ -49,7 +49,7 @@ namespace LearningDiaryMae
                                           "3. Find a topic by id or title\n" +
                                           "4. Edit a topic\n" +
                                           "5. Delete a topic\n" +
-                                          "6. Get tasks related to a topic\n" +
+                                          "6. Print tasks related to a topic\n" +
                                           "7. Exit the app");
                         int topicMenuInput = ValidateIntInput(Console.ReadLine());
 
@@ -57,7 +57,7 @@ namespace LearningDiaryMae
                         //what to do with topics
                         switch (topicMenuInput)
                         {
-                            case 1: //adding a topic to dictionary with method
+                            case 1: //adding a topic to database with method
                                 Models.Topic newTopic = AddTopic();
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
@@ -71,7 +71,7 @@ namespace LearningDiaryMae
                                 break;
 
                             case 3: //finding a topic by id or title
-                                var editTopic = ChooseIdOrTitle("find");
+                                Topic editTopic = ChooseIdOrTitle("find");
                                 Console.WriteLine(editTopic.ToStringPrint());
                                 break;
 
@@ -84,7 +84,7 @@ namespace LearningDiaryMae
                                                       "2) Topic description\n" +
                                                       "3) Source\n" +
                                                       "4) Date completed (DD/MM/YYYY)");
-                                    var topicFieldChoice = ValidateIntInput(Console.ReadLine());
+                                    int topicFieldChoice = ValidateIntInput(Console.ReadLine());
                                     editTopic.LastEditDate = DateTime.Now;
 
                                     switch (topicFieldChoice)
@@ -114,7 +114,6 @@ namespace LearningDiaryMae
                                             Console.WriteLine("Did you choose a number between 1 and 4?");
                                             break;
                                     }
-
                                     newContext.SaveChanges();
                                 }
                                 break;
@@ -134,11 +133,11 @@ namespace LearningDiaryMae
 
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    var id = topicId;
-                                    var something = newContext.Tasks.Where(task => task.Topic == id);
+                                    int id = topicId;
+                                    IQueryable<Task> tasks = newContext.Tasks.Where(task => task.Topic == id);
                                     Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-                                    foreach (var item in something)
+                                    foreach (var item in tasks)
                                     {
                                         Console.WriteLine(item.ToStringPrint());
                                         Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -146,11 +145,12 @@ namespace LearningDiaryMae
                                 }
                                 break;
 
-                            case 7: //exit the app
+                            case 7: //exit the app from topic menu
                                 exit = true;
                                 Console.WriteLine("Exiting app.");
                                 break;
 
+                            //topic menu default
                             default:
                                 Console.WriteLine("Did you choose a number between 1 and 7?");
                                 break;
@@ -221,11 +221,7 @@ namespace LearningDiaryMae
 
                                         case 4:
                                             Console.WriteLine("Is the task done? Yes/no");
-                                            string input5 = Console.ReadLine().ToLower();
-                                            if (input5.Equals("yes"))
-                                                editTask.Done = true;
-                                            else if (input5.Equals("no"))
-                                                editTask.Done = false;
+                                            editTask.Done = ValidateYesOrNoInput(Console.ReadLine());
                                             break;
 
                                         //set task priority
@@ -244,7 +240,7 @@ namespace LearningDiaryMae
                                                     editTask.Priority = "Optional";
                                                     break;
                                                 default:
-                                                    Console.WriteLine("No task priority set.");
+                                                    Console.WriteLine("No priority set.");
                                                     editTask.Priority = null;
                                                     break;
                                             }
@@ -254,7 +250,7 @@ namespace LearningDiaryMae
                                         case 6:
                                             Console.WriteLine("Enter the new note:");
                                             string newNote = Console.ReadLine();
-                                            editTask.Notes = editTask.Notes + "\n" + newNote;
+                                            editTask.Notes += "\n" + newNote;
                                             break;
 
                                         default:
@@ -274,22 +270,27 @@ namespace LearningDiaryMae
                                 }
                                 break;
 
-                            case 6: //exit the app
+                            case 6: //exit the app from task menu
                                 exit = true;
                                 Console.WriteLine("Exiting app.");
                                 break;
 
+                            //task menu default
                             default:
                                 Console.WriteLine("Did you choose a number between 1 and 6?");
                                 break;
                         }
                     }
+
+                    //exit the app from main menu
                     else if (mainMenuInput == 3)
                     {
                         exit = true;
                         Console.WriteLine("Exiting app.");
                         break;
                     }
+
+                    //main menu default
                     else
                     {
                         Console.WriteLine("Did you choose a number between 1 and 3?");
@@ -297,7 +298,7 @@ namespace LearningDiaryMae
                 }
                 catch (Exception e) //if all else fails, no crash
                 {
-                    Console.WriteLine("Oh dear, we encountered an error... Please try again.\n" + e);
+                    Console.WriteLine("Oh dear, we encountered an error... Please try again.\n\n" + e);
                     continue;
                 }
             } while (exit == false);
@@ -393,7 +394,7 @@ namespace LearningDiaryMae
                 int idOption = ValidateIntInput(Console.ReadLine());
                 using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    Topic option = connection.Topics.Where(x => x.Id == idOption).Select(x => x).FirstOrDefault();
+                    Topic option = connection.Topics.FirstOrDefault(x => x.Id == idOption);
                     edit = option;
                 }
             }
@@ -404,7 +405,7 @@ namespace LearningDiaryMae
                 string titleOption = Console.ReadLine();
                 using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    Topic option = connection.Topics.Where(x => x.Title == titleOption).Select(x => x).FirstOrDefault();
+                    Topic option = connection.Topics.FirstOrDefault(x => x.Title == titleOption);
                     edit = option;
                 }
             }
@@ -443,7 +444,7 @@ namespace LearningDiaryMae
                 int idOption = ValidateIntInput(Console.ReadLine());
                 using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    var option = connection.Tasks.Where(x => x.Id == idOption).Select(x => x).FirstOrDefault();
+                    var option = connection.Tasks.FirstOrDefault(x => x.Id == idOption);
                     edit = option;
                 }
             }
@@ -454,7 +455,7 @@ namespace LearningDiaryMae
                 string titleOption = Console.ReadLine();
                 using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    var option = connection.Tasks.Where(x => x.Title == titleOption).Select(x => x).FirstOrDefault();
+                    var option = connection.Tasks.FirstOrDefault(x => x.Title == titleOption);
                     edit = option;
                 }
             }
@@ -509,8 +510,8 @@ namespace LearningDiaryMae
                     priority = "Optional";
                     break;
                 default:
-                    priority = "";
                     Console.WriteLine("No priority set");
+                    priority = null;
                     break;
             }
 
@@ -530,44 +531,41 @@ namespace LearningDiaryMae
             return newTask;
         }
 
-        public static int ValidateIntInput(string input)
+        public static int ValidateIntInput(string x)
         {
-            int newInput = 0;
-
+            int newInput;
             while (true)
             {
-                try
+                if (int.TryParse(x, out newInput))
                 {
-                    newInput = Convert.ToInt32(input);
+                    break;
                 }
-                catch (Exception e)
+                else
                 {
                     Console.WriteLine("Please give a number:");
-                    input = Console.ReadLine();
+                    x = Console.ReadLine();
                     continue;
                 }
-                break;
             }
+
             return newInput;
         }
 
-        public static DateTime ValidateDateTimeInput(string input)
+        public static DateTime ValidateDateTimeInput(string x)
         {
-            DateTime newInput = new DateTime();
-
+            DateTime newInput;
             while (true)
             {
-                try
+                if (DateTime.TryParse(x, out newInput))
                 {
-                    newInput = Convert.ToDateTime(input);
+                    break;
                 }
-                catch (Exception e)
+                else
                 {
                     Console.WriteLine("Please give a date (DD/MM/YYYY):");
-                    input = Console.ReadLine();
+                    x = Console.ReadLine();
                     continue;
                 }
-                break;
             }
             return newInput;
         }
