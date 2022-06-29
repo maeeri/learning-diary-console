@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading;
 using LearningDiaryMae.Models;
-using static ClassLibraryDateMethods.DateMethods;
+using static ClassLibraryDateMethods.Class1;
 
 namespace LearningDiaryMae
 {
@@ -85,27 +85,29 @@ namespace LearningDiaryMae
                                                       "3) Source\n" +
                                                       "4) Date completed (DD/MM/YYYY)");
                                     var topicFieldChoice = ValidateIntInput(Console.ReadLine());
-                                    Console.WriteLine("Enter the new field:");
-                                    var inputTopicField = Console.ReadLine();
                                     editTopic.LastEditDate = DateTime.Now;
 
                                     switch (topicFieldChoice)
                                     {
                                         case 1:
-                                            editTopic.Title = inputTopicField;
+                                            Console.WriteLine("Enter the new title:");
+                                            editTopic.Title = Console.ReadLine();
                                             break;
 
                                         case 2:
-                                            editTopic.Description = inputTopicField;
+                                            Console.WriteLine("Enter the new description:");
+                                            editTopic.Description = Console.ReadLine();
                                             break;
 
                                         case 3:
-                                            editTopic.Source = inputTopicField;
+                                            Console.WriteLine("Enter the source:");
+                                            editTopic.Source = Console.ReadLine();
                                             break;
 
                                         case 4:
-                                            var topicCompletionDate = Convert.ToDateTime(inputTopicField);
-                                            editTopic.CompletionDate = topicCompletionDate;
+                                            GiveCompletionDate(out bool inProgress, out DateTime? completionDate);
+                                            editTopic.InProgress = inProgress;
+                                            editTopic.CompletionDate = completionDate;
                                             break;
 
                                         default:
@@ -132,7 +134,8 @@ namespace LearningDiaryMae
 
                                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                                 {
-                                    var something = newContext.Tasks.Where(task => task.Topic == topicId);
+                                    var id = topicId;
+                                    var something = newContext.Tasks.Where(task => task.Topic == id);
                                     Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                                     foreach (var item in something)
@@ -334,32 +337,7 @@ namespace LearningDiaryMae
             //if study is complete, ask for end date. If end date is in the future, ask whether study is complete again
             if (finished)
             {
-                while (true)
-                {
-                    try
-                    {
-                        Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
-                        completionDate = ValidateDateTimeInput(Console.ReadLine());
-                        bool isFutureDate = FutureDate((DateTime)completionDate);
-
-                        if (!isFutureDate)
-                            break;
-                        else
-                        {
-                            Console.WriteLine("The date you gave seems to be in the future. Is your study finished? Yes/no");
-                            bool studyComplete = ValidateYesOrNoInput(Console.ReadLine());
-
-                            if (studyComplete)
-                                continue;
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        continue;
-                    }
-                    inProgress = false;
-                    break;
-                }
+                GiveCompletionDate(out inProgress, out completionDate);
             }
 
             DateTime lastEditDate = DateTime.Now;
@@ -612,6 +590,38 @@ namespace LearningDiaryMae
                 break;
             }
             return newInput;
+        }
+
+        //gets completion date, makes sure it is in the past, returns whether study in progress and the completion date
+        public static void GiveCompletionDate(out bool inProgress, out DateTime? completionDate)
+        {
+            completionDate = new DateTime?();
+            inProgress = true;
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("When did you finish with the topic? DD/MM/YYYY");
+                    completionDate = ValidateDateTimeInput(Console.ReadLine());
+                    var isFutureDate = FutureDate((DateTime)completionDate);
+
+                    if (isFutureDate)
+                    {
+                        Console.WriteLine("The date you gave seems to be in the future. Is your study finished? Yes/no");
+                        bool studyComplete = ValidateYesOrNoInput(Console.ReadLine());
+
+                        if (studyComplete)
+                        {
+                            inProgress = false;
+                        }
+                        continue;
+                    }
+                }
+                catch (Exception e)
+                {
+                    continue;
+                }
+            }
         }
     }
 }
