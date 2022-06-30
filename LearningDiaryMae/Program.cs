@@ -60,12 +60,12 @@ namespace LearningDiaryMae
                         {
                             case 1: //adding a topic to database with method
                                 Console.Clear();
-                                AddTopic();
+                                await AddTopic();
                                 break;
 
                             case 2: //printing a list of topics, from database using method
                                 Console.Clear();
-                                PrintTopics();
+                                await PrintTopics();
                                 break;
 
                             case 3: //finding a topic by id or title
@@ -87,7 +87,7 @@ namespace LearningDiaryMae
 
                             case 6: //print tasks related to a specific topic
                                 Console.Clear();
-                                PrintTasksForTopic();
+                                await PrintTasksForTopic();
                                 break;
 
                             case 7: //exit the app from topic menu
@@ -119,12 +119,12 @@ namespace LearningDiaryMae
                         {
                             case 1: //adding a task
                                 Console.Clear();
-                                AddTask();
+                                await AddTask();
                                 break;
 
                             case 2: //print tasks from database
                                 Console.Clear();
-                                PrintTasks();
+                                await PrintTasks();
                                 break;
 
                             case 3: //finding a task by id or title
