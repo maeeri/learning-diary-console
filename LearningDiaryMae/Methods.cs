@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using LearningDiaryMae.Models;
 using static ClassLibraryDateMethods.Class1;
 
@@ -8,7 +9,6 @@ namespace LearningDiaryMae
 {
     public static class Methods
     {
-
         //add a topic
         public static void AddTopic()
         {
@@ -459,9 +459,9 @@ namespace LearningDiaryMae
         }
 
         //remove a topic or task from database
-        public static void DeleteRow(Object toBeDeleted)
+        public static async Task DeleteRow(Object toBeDeleted)
         {
-            using (LearningDiaryContext newContext = new LearningDiaryContext())
+            await using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
                 newContext.Remove(toBeDeleted);
                 newContext.SaveChanges();

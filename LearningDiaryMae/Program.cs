@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using LearningDiaryMae.Models;
 using static ClassLibraryDateMethods.Class1;
 using static LearningDiaryMae.Methods;
@@ -9,8 +10,7 @@ namespace LearningDiaryMae
 {
     class Program
     {
-
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             //declare universal variables
             bool exit = false;
@@ -71,7 +71,7 @@ namespace LearningDiaryMae
                             case 3: //finding a topic by id or title
                                 Console.Clear();
                                 DiaryTopic editDiaryTopic = ChooseIdOrTitle("topic", "find") as DiaryTopic;
-                                Console.WriteLine(editDiaryTopic.ToStringPrint());
+                                if (editDiaryTopic != null) Console.WriteLine(editDiaryTopic.ToStringPrint());
                                 break;
 
                             case 4: //editing by id or title
@@ -82,7 +82,7 @@ namespace LearningDiaryMae
                             case 5: // deleting by id or title
                                 Console.Clear();
                                 editDiaryTopic = ChooseIdOrTitle("topic", "delete") as DiaryTopic;
-                                DeleteRow(editDiaryTopic);
+                                await DeleteRow(editDiaryTopic);
                                 break;
 
                             case 6: //print tasks related to a specific topic
@@ -130,7 +130,7 @@ namespace LearningDiaryMae
                             case 3: //finding a task by id or title
                                 Console.Clear();
                                 DiaryTask editDiaryTask = ChooseIdOrTitle("task","find") as DiaryTask;
-                                Console.WriteLine(editDiaryTask.ToStringPrint());
+                                if (editDiaryTask != null) Console.WriteLine(editDiaryTask.ToStringPrint());
                                 break;
 
                             case 4: //editing by id or title
@@ -141,7 +141,7 @@ namespace LearningDiaryMae
                             case 5: // deleting by id or title
                                 Console.Clear();
                                 editDiaryTask = ChooseIdOrTitle("task", "delete") as DiaryTask;
-                                DeleteRow(editDiaryTask);
+                                await DeleteRow(editDiaryTask);
                                 break;
 
                             case 6: //exit the app from task menu
