@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace LearningDiaryMae.Models
 {
-    public partial class Topic
+    public partial class DiaryTopic
     {
-        public Topic()
+        public DiaryTopic()
         {
-            Tasks = new HashSet<Task>();
+            Tasks = new HashSet<DiaryTask>();
         }
 
         public int Id { get; set; }
@@ -23,7 +23,7 @@ namespace LearningDiaryMae.Models
         public DateTime? LastEditDate { get; set; }
         public DateTime? CompletionDate { get; set; }
 
-        public virtual ICollection<Task> Tasks { get; set; }
+        public virtual ICollection<DiaryTask> Tasks { get; set; }
 
         //method to calculate time spent on the topic
         public double CalculateTimeSpent()

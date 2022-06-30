@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace LearningDiaryMae.Models
 {
-    public partial class Task
+    public partial class DiaryTask
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -16,7 +16,7 @@ namespace LearningDiaryMae.Models
         public bool? Done { get; set; }
         public int? Topic { get; set; }
 
-        public virtual Topic TopicNavigation { get; set; }
+        public virtual DiaryTopic DiaryTopicNavigation { get; set; }
 
         private string IsDone()
         {

@@ -48,7 +48,7 @@ namespace LearningDiaryMae
 
             DateTime lastEditDate = DateTime.Now;
 
-            Topic newTopic = new Topic()
+            DiaryTopic newDiaryTopic = new DiaryTopic()
             {
                 Title = title,
                 Description = description,
@@ -59,11 +59,11 @@ namespace LearningDiaryMae
                 LastEditDate = lastEditDate,
                 InProgress = inProgress
             };
-            newTopic.TimeSpent = (int?)newTopic.CalculateTimeSpent();
+            newDiaryTopic.TimeSpent = (int?)newDiaryTopic.CalculateTimeSpent();
 
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
-                newContext.Topics.Add(newTopic);
+                newContext.Topics.Add(newDiaryTopic);
                 newContext.SaveChanges();
             };
         }
@@ -76,7 +76,7 @@ namespace LearningDiaryMae
 
                 using (LearningDiaryContext newContext = new LearningDiaryContext())
                 {
-                    IQueryable<Topic> read = newContext.Topics.Select(topic => topic);
+                    IQueryable<DiaryTopic> read = newContext.Topics.Select(topic => topic);
                     foreach (var topic in read)
                     {
                         Console.WriteLine($"Id: {topic.Id}\n" +
@@ -90,36 +90,42 @@ namespace LearningDiaryMae
             }
         }
 
-        //choosing topic by id or title, procedure = thing to be done to the topic
-        public static Topic ChooseIdOrTitle(string procedure)
+        //choosing topic or task by id or title, target = topic or task, procedure = thing to be done to the topic
+        public static Object ChooseIdOrTitle(string target, string procedure)
         {
-            Console.WriteLine("Would you like to select the topic by 1) ID or 2) title?");
-            int input = ValidateIntInput(Console.ReadLine());
-            Topic edit = new Topic();
-
-            //finds the topic to be modified
-            if (input == 1)
+            while (true)
             {
-                Console.WriteLine($"Which topic would you like to {procedure}?");
-                int idOption = ValidateIntInput(Console.ReadLine());
+                Console.WriteLine($"What is the title or Id of the {target} you want to {procedure}");
+                string input = Console.ReadLine();
+                int idOption;
+                DiaryTopic optionDiaryTopic = new DiaryTopic();
+                DiaryTask optionDiaryTask = new DiaryTask();
+                Object? edit;
                 using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    Topic option = connection.Topics.FirstOrDefault(x => x.Id == idOption);
-                    edit = option;
-                }
-            }
+                    if (int.TryParse(input, out idOption))
+                    {
+                        optionDiaryTopic = connection.Topics.FirstOrDefault(x => x.Id == idOption);
+                        optionDiaryTask = connection.Tasks.FirstOrDefault(x => x.Id == idOption);
+                    }
 
-            else if (input == 2)
-            {
-                Console.WriteLine($"Which topic would you like to {procedure}?");
-                string titleOption = Console.ReadLine();
-                using (LearningDiaryContext connection = new LearningDiaryContext())
-                {
-                    Topic option = connection.Topics.FirstOrDefault(x => x.Title == titleOption);
-                    edit = option;
+                    else
+                    {
+                        optionDiaryTopic = connection.Topics.FirstOrDefault(x => x.Title == input);
+                        optionDiaryTask = connection.Tasks.FirstOrDefault(x => x.Title == input);
+                    }
+
+                    if (target == "topic")
+                        edit = optionDiaryTopic;
+                    else
+                        edit = optionDiaryTask;
+
+                    if (edit != null)
+                        return edit;
+                    else
+                        Console.WriteLine($"The id or title of the {target} you gave doesn't seem to exist. Please try again.");
                 }
             }
-            return edit;
         }
 
         //print tasks from database
@@ -140,38 +146,7 @@ namespace LearningDiaryMae
             }
         }
 
-        //choosing topic by id or title, procedure = thing to be done to the task
-        public static Task ChooseTaskIdOrTitle(string procedure)
-        {
-            Console.WriteLine("Would you like to select the task by 1) ID or 2) title?");
-            int input = ValidateIntInput(Console.ReadLine());
-            Task edit = new Task();
-
-            //finds the topic to be modified
-            if (input == 1)
-            {
-                Console.WriteLine($"Which task would you like to {procedure}?");
-                int idOption = ValidateIntInput(Console.ReadLine());
-                using (LearningDiaryContext connection = new LearningDiaryContext())
-                {
-                    var option = connection.Tasks.FirstOrDefault(x => x.Id == idOption);
-                    edit = option;
-                }
-            }
-
-            else if (input == 2)
-            {
-                Console.WriteLine($"Which task would you like to {procedure}?");
-                string titleOption = Console.ReadLine();
-                using (LearningDiaryContext connection = new LearningDiaryContext())
-                {
-                    var option = connection.Tasks.FirstOrDefault(x => x.Title == titleOption);
-                    edit = option;
-                }
-            }
-            return edit;
-        }
-
+        //add task
         public static void AddTask()
         {
             Console.WriteLine("Is the task linked to an existing study topic? Yes/no");
@@ -184,10 +159,10 @@ namespace LearningDiaryMae
                 topicId = ValidateIntInput(Console.ReadLine());
             }
 
-            Console.WriteLine("Task title:");
+            Console.WriteLine("DiaryTask title:");
             string taskTitle = Console.ReadLine();
 
-            Console.WriteLine("Task description: ");
+            Console.WriteLine("DiaryTask description: ");
             string taskDescription = Console.ReadLine();
 
             //doesn't work yet
@@ -228,7 +203,7 @@ namespace LearningDiaryMae
             Console.WriteLine("Is the task done? yes/no");
             bool done = ValidateYesOrNoInput(Console.ReadLine());
 
-            Task newTask = new Task()
+            DiaryTask newDiaryTask = new DiaryTask()
             {
                 Title = taskTitle,
                 Description = taskDescription,
@@ -240,7 +215,7 @@ namespace LearningDiaryMae
             };
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
-                newContext.Add(newTask);
+                newContext.Add(newDiaryTask);
                 newContext.SaveChanges();
             }
         }
@@ -307,7 +282,7 @@ namespace LearningDiaryMae
         }
 
         //gets completion date, makes sure it is in the past, returns whether study in progress and the completion date
-        public static void GiveCompletionDate(out bool inProgress, out DateTime? completionDate)
+        private static void GiveCompletionDate(out bool inProgress, out DateTime? completionDate)
         {
             completionDate = new DateTime?();
             inProgress = false;
@@ -353,7 +328,7 @@ namespace LearningDiaryMae
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
                 int id = topicId;
-                IQueryable<Task> tasks = newContext.Tasks.Where(task => task.Topic == id);
+                IQueryable<DiaryTask> tasks = newContext.Tasks.Where(task => task.Topic == id);
                 Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
                 foreach (var item in tasks)
@@ -369,36 +344,36 @@ namespace LearningDiaryMae
         {
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
-                Topic editTopic = ChooseIdOrTitle("edit");
+                DiaryTopic editDiaryTopic = ChooseIdOrTitle("topic", "edit") as DiaryTopic;
                 Console.WriteLine("Which field would you like to edit?\n" +
-                                  "1) Topic title\n" +
-                                  "2) Topic description\n" +
+                                  "1) DiaryTopic title\n" +
+                                  "2) DiaryTopic description\n" +
                                   "3) Source\n" +
                                   "4) Date completed (DD/MM/YYYY)");
                 int topicFieldChoice = ValidateIntInput(Console.ReadLine());
-                editTopic.LastEditDate = DateTime.Now;
+                editDiaryTopic.LastEditDate = DateTime.Now;
 
                 switch (topicFieldChoice)
                 {
                     case 1:
                         Console.WriteLine("Enter the new title:");
-                        editTopic.Title = Console.ReadLine();
+                        editDiaryTopic.Title = Console.ReadLine();
                         break;
 
                     case 2:
                         Console.WriteLine("Enter the new description:");
-                        editTopic.Description = Console.ReadLine();
+                        editDiaryTopic.Description = Console.ReadLine();
                         break;
 
                     case 3:
                         Console.WriteLine("Enter the source:");
-                        editTopic.Source = Console.ReadLine();
+                        editDiaryTopic.Source = Console.ReadLine();
                         break;
 
                     case 4:
                         GiveCompletionDate(out bool inProgress, out DateTime? completionDate);
-                        editTopic.InProgress = inProgress;
-                        editTopic.CompletionDate = completionDate;
+                        editDiaryTopic.InProgress = inProgress;
+                        editDiaryTopic.CompletionDate = completionDate;
                         break;
 
                     default:
@@ -412,13 +387,13 @@ namespace LearningDiaryMae
         //edit task
         public static void EditTask()
         {
-            Task editTask = ChooseTaskIdOrTitle("edit");
+            DiaryTask editDiaryTask = ChooseIdOrTitle("task", "edit") as DiaryTask;
             Console.WriteLine("Which field would you like to edit?\n" +
-                              "1) Task title\n" +
-                              "2) Task description\n" +
+                              "1) DiaryTask title\n" +
+                              "2) DiaryTask description\n" +
                               "3) Deadline(DD/MM/YYYY)\n" +
-                              "4) Task status (done/not done)\n" +
-                              "5) Task priority\n" +
+                              "4) DiaryTask status (done/not done)\n" +
+                              "5) DiaryTask priority\n" +
                               "6) Add a note");
             int taskEditField = ValidateIntInput(Console.ReadLine());
 
@@ -428,22 +403,22 @@ namespace LearningDiaryMae
                 {
                     case 1:
                         Console.WriteLine("Enter the new title:");
-                        editTask.Title = Console.ReadLine();
+                        editDiaryTask.Title = Console.ReadLine();
                         break;
 
                     case 2:
                         Console.WriteLine("Enter the new description:");
-                        editTask.Description = Console.ReadLine();
+                        editDiaryTask.Description = Console.ReadLine();
                         break;
 
                     case 3:
                         Console.WriteLine("Enter the new deadline:");
-                        editTask.Deadline = ValidateDateTimeInput(Console.ReadLine());
+                        editDiaryTask.Deadline = ValidateDateTimeInput(Console.ReadLine());
                         break;
 
                     case 4:
                         Console.WriteLine("Is the task done? Yes/no");
-                        editTask.Done = ValidateYesOrNoInput(Console.ReadLine());
+                        editDiaryTask.Done = ValidateYesOrNoInput(Console.ReadLine());
                         break;
 
                     //set task priority
@@ -453,17 +428,17 @@ namespace LearningDiaryMae
                         switch (priorityInput)
                         {
                             case 1:
-                                editTask.Priority = "Urgent";
+                                editDiaryTask.Priority = "Urgent";
                                 break;
                             case 2:
-                                editTask.Priority = "Not urgent";
+                                editDiaryTask.Priority = "Not urgent";
                                 break;
                             case 3:
-                                editTask.Priority = "Optional";
+                                editDiaryTask.Priority = "Optional";
                                 break;
                             default:
                                 Console.WriteLine("No priority set.");
-                                editTask.Priority = null;
+                                editDiaryTask.Priority = null;
                                 break;
                         }
                         break;
@@ -472,13 +447,23 @@ namespace LearningDiaryMae
                     case 6:
                         Console.WriteLine("Enter the new note:");
                         string newNote = Console.ReadLine();
-                        editTask.Notes += "\n" + newNote;
+                        editDiaryTask.Notes += "\n" + newNote;
                         break;
 
                     default:
                         Console.WriteLine("Did you choose a number between 1 and 4?");
                         break;
                 }
+                newContext.SaveChanges();
+            }
+        }
+
+        //remove a topic or task from database
+        public static void DeleteRow(Object toBeDeleted)
+        {
+            using (LearningDiaryContext newContext = new LearningDiaryContext())
+            {
+                newContext.Remove(toBeDeleted);
                 newContext.SaveChanges();
             }
         }

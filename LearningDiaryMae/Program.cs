@@ -29,7 +29,7 @@ namespace LearningDiaryMae
                 Thread.Sleep(10);
             }
 
-            //loop topic editing
+            //loop editing
             do
             {
                 try
@@ -59,36 +59,39 @@ namespace LearningDiaryMae
                         switch (topicMenuInput)
                         {
                             case 1: //adding a topic to database with method
+                                Console.Clear();
                                 AddTopic();
                                 break;
 
                             case 2: //printing a list of topics, from database using method
+                                Console.Clear();
                                 PrintTopics();
                                 break;
 
                             case 3: //finding a topic by id or title
-                                Topic editTopic = ChooseIdOrTitle("find");
-                                Console.WriteLine(editTopic.ToStringPrint());
+                                Console.Clear();
+                                DiaryTopic editDiaryTopic = ChooseIdOrTitle("topic", "find") as DiaryTopic;
+                                Console.WriteLine(editDiaryTopic.ToStringPrint());
                                 break;
 
                             case 4: //editing by id or title
+                                Console.Clear();
                                 EditTopic();
                                 break;
 
                             case 5: // deleting by id or title
-                                editTopic = ChooseIdOrTitle("delete");
-                                using (LearningDiaryContext newContext = new LearningDiaryContext())
-                                {
-                                    newContext.Remove(editTopic);
-                                    newContext.SaveChanges();
-                                }
+                                Console.Clear();
+                                editDiaryTopic = ChooseIdOrTitle("topic", "delete") as DiaryTopic;
+                                DeleteRow(editDiaryTopic);
                                 break;
 
                             case 6: //print tasks related to a specific topic
+                                Console.Clear();
                                 PrintTasksForTopic();
                                 break;
 
                             case 7: //exit the app from topic menu
+                                Console.Clear();
                                 exit = true;
                                 Console.WriteLine("Exiting app.");
                                 break;
@@ -115,32 +118,34 @@ namespace LearningDiaryMae
                         switch (taskMenuChoice)
                         {
                             case 1: //adding a task
+                                Console.Clear();
                                 AddTask();
                                 break;
 
                             case 2: //print tasks from database
+                                Console.Clear();
                                 PrintTasks();
                                 break;
 
                             case 3: //finding a task by id or title
-                                Task editTask = ChooseTaskIdOrTitle("find");
-                                Console.WriteLine(editTask.ToStringPrint());
+                                Console.Clear();
+                                DiaryTask editDiaryTask = ChooseIdOrTitle("task","find") as DiaryTask;
+                                Console.WriteLine(editDiaryTask.ToStringPrint());
                                 break;
 
                             case 4: //editing by id or title
+                                Console.Clear();
                                 EditTask();
                                 break;
 
                             case 5: // deleting by id or title
-                                editTask = ChooseTaskIdOrTitle("delete");
-                                using (LearningDiaryContext newContext = new LearningDiaryContext())
-                                {
-                                    newContext.Remove(editTask);
-                                    newContext.SaveChanges();
-                                }
+                                Console.Clear();
+                                editDiaryTask = ChooseIdOrTitle("task", "delete") as DiaryTask;
+                                DeleteRow(editDiaryTask);
                                 break;
 
                             case 6: //exit the app from task menu
+                                Console.Clear();
                                 exit = true;
                                 Console.WriteLine("Exiting app.");
                                 break;
@@ -155,6 +160,7 @@ namespace LearningDiaryMae
                     //exit the app from main menu
                     else if (mainMenuInput == 3)
                     {
+                        Console.Clear();
                         exit = true;
                         Console.WriteLine("Exiting app.");
                         break;

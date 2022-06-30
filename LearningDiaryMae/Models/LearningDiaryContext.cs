@@ -17,8 +17,8 @@ namespace LearningDiaryMae.Models
         {
         }
 
-        public virtual DbSet<Task> Tasks { get; set; }
-        public virtual DbSet<Topic> Topics { get; set; }
+        public virtual DbSet<DiaryTask> Tasks { get; set; }
+        public virtual DbSet<DiaryTopic> Topics { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -33,7 +33,7 @@ namespace LearningDiaryMae.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Latin1_General_CI_AS");
 
-            modelBuilder.Entity<Task>(entity =>
+            modelBuilder.Entity<DiaryTask>(entity =>
             {
                 entity.ToTable("task");
 
@@ -54,13 +54,13 @@ namespace LearningDiaryMae.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.TopicNavigation)
+                entity.HasOne(d => d.DiaryTopicNavigation)
                     .WithMany(p => p.Tasks)
                     .HasForeignKey(d => d.Topic)
                     .HasConstraintName("FK__task__topic_id__36B12243");
             });
 
-            modelBuilder.Entity<Topic>(entity =>
+            modelBuilder.Entity<DiaryTopic>(entity =>
             {
                 entity.ToTable("topic");
 
