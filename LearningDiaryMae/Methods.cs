@@ -21,7 +21,7 @@ namespace LearningDiaryMae
             Console.WriteLine("How much time (days) do you estimate you need for mastering the topic?");
             int timeToMaster = ValidateIntInput(Console.ReadLine());
 
-            Console.WriteLine("Did you use a source? Yes/no");
+            Console.WriteLine("Did/will you use a source? Yes/no");
             bool usedSource = ValidateYesOrNoInput(Console.ReadLine());
 
             string source = "";
@@ -31,7 +31,7 @@ namespace LearningDiaryMae
                 source = Console.ReadLine();
             }
 
-            Console.WriteLine("When did you start studying? DD/MM/YYYY");
+            Console.WriteLine("When did/will you start studying? DD/MM/YYYY");
             DateTime startLearningDate = ValidateDateTimeInput(Console.ReadLine());
 
             Console.WriteLine("Is your study finished? Yes/no");
@@ -61,10 +61,10 @@ namespace LearningDiaryMae
             };
             newDiaryTopic.TimeSpent = (int?)newDiaryTopic.CalculateTimeSpent();
 
-            await using (LearningDiaryContext newContext = new LearningDiaryContext())
+            using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
                 newContext.Topics.Add(newDiaryTopic);
-                newContext.SaveChanges();
+                await newContext.SaveChangesAsync();
             };
         }
 
@@ -72,7 +72,7 @@ namespace LearningDiaryMae
         public static async Task PrintTopics()
         {
             Console.WriteLine("A list of your study topics:\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            using (LearningDiaryContext newContext = new LearningDiaryContext())
+            await using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
                 IQueryable<DiaryTopic> read = newContext.Topics.Select(topic => topic);
                 foreach (var topic in read)
@@ -88,19 +88,17 @@ namespace LearningDiaryMae
         }
 
         //choosing topic or task by id or title, target = topic or task, procedure = thing to be done to the topic
-        public static Object ChooseIdOrTitle(string target, string procedure)
+        public static async Task<Object> ChooseIdOrTitle(string target, string procedure)
         {
             while (true)
             {
                 Console.WriteLine($"What is the title or Id of the {target} you want to {procedure}");
                 string input = Console.ReadLine();
-                int idOption;
-                DiaryTopic optionDiaryTopic = new DiaryTopic();
-                DiaryTask optionDiaryTask = new DiaryTask();
-                Object? edit;
-                using (LearningDiaryContext connection = new LearningDiaryContext())
+                await using (LearningDiaryContext connection = new LearningDiaryContext())
                 {
-                    if (int.TryParse(input, out idOption))
+                    DiaryTask optionDiaryTask;
+                    DiaryTopic optionDiaryTopic;
+                    if (int.TryParse(input, out int idOption))
                     {
                         optionDiaryTopic = connection.Topics.FirstOrDefault(x => x.Id == idOption);
                         optionDiaryTask = connection.Tasks.FirstOrDefault(x => x.Id == idOption);
@@ -112,6 +110,7 @@ namespace LearningDiaryMae
                         optionDiaryTask = connection.Tasks.FirstOrDefault(x => x.Title == input);
                     }
 
+                    Object? edit;
                     if (target == "topic")
                         edit = optionDiaryTopic;
                     else
@@ -335,9 +334,9 @@ namespace LearningDiaryMae
         }
 
         //edit topic
-        public static void EditTopic()
+        public static async Task EditTopic()
         {
-            DiaryTopic editDiaryTopic = ChooseIdOrTitle("topic", "edit") as DiaryTopic;
+            DiaryTopic editDiaryTopic = await ChooseIdOrTitle("topic", "edit") as DiaryTopic;
             Console.WriteLine("Which field would you like to edit?\n" +
                               "1) DiaryTopic title\n" +
                               "2) DiaryTopic description\n" +
@@ -381,9 +380,9 @@ namespace LearningDiaryMae
         }
 
         //edit task
-        public static void EditTask()
+        public static async Task EditTask()
         {
-            DiaryTask editDiaryTask = ChooseIdOrTitle("task", "edit") as DiaryTask;
+            DiaryTask editDiaryTask = await ChooseIdOrTitle("task", "edit") as DiaryTask;
             Console.WriteLine("Which field would you like to edit?\n" +
                               "1) DiaryTask title\n" +
                               "2) DiaryTask description\n" +

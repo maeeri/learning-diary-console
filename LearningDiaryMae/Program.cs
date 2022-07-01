@@ -36,22 +36,22 @@ namespace LearningDiaryMae
                 {
                     //ask user whether to work with topics or tasks
                     Console.WriteLine("\nWhat do you want to do?\n" +
-                                      "1. Work with topics\n" +
-                                      "2. Work with tasks\n" +
-                                      "3. Exit the app");
+                                      "1) Work with topics\n" +
+                                      "2) Work with tasks\n" +
+                                      "3) Exit the app");
                     int mainMenuInput = ValidateIntInput(Console.ReadLine());
 
                     if (mainMenuInput == 1)
                     {
                         //ask what the user wants to do and go to switch
                         Console.WriteLine("What do you want to do?\n" +
-                                          "1. Add a topic of study\n" +
-                                          "2. Print a current list of topics\n" +
-                                          "3. Find a topic by id or title\n" +
-                                          "4. Edit a topic\n" +
-                                          "5. Delete a topic\n" +
-                                          "6. Print tasks related to a topic\n" +
-                                          "7. Exit the app");
+                                          "1) Add a topic of study\n" +
+                                          "2) Print a current list of topics\n" +
+                                          "3) Find a topic by id or title\n" +
+                                          "4) Edit a topic\n" +
+                                          "5) Delete a topic\n" +
+                                          "6) Print tasks related to a topic\n" +
+                                          "7) Exit the app");
                         int topicMenuInput = ValidateIntInput(Console.ReadLine());
 
 
@@ -70,7 +70,7 @@ namespace LearningDiaryMae
 
                             case 3: //finding a topic by id or title
                                 Console.Clear();
-                                DiaryTopic editDiaryTopic = ChooseIdOrTitle("topic", "find") as DiaryTopic;
+                                DiaryTopic editDiaryTopic = await ChooseIdOrTitle("topic", "find") as DiaryTopic;
                                 if (editDiaryTopic != null) Console.WriteLine(editDiaryTopic.ToStringPrint());
                                 break;
 
@@ -81,7 +81,7 @@ namespace LearningDiaryMae
 
                             case 5: // deleting by id or title
                                 Console.Clear();
-                                editDiaryTopic = ChooseIdOrTitle("topic", "delete") as DiaryTopic;
+                                editDiaryTopic = await ChooseIdOrTitle("topic", "delete") as DiaryTopic;
                                 await DeleteRow(editDiaryTopic);
                                 break;
 
@@ -107,12 +107,12 @@ namespace LearningDiaryMae
                     else if (mainMenuInput == 2)
                     {
                         Console.WriteLine("What do you want to do?\n" +
-                                          "1. Add a task\n" +
-                                          "2. Print a current list of tasks\n" +
-                                          "3. Find a task by id or title\n" +
-                                          "4. Edit a task\n" +
-                                          "5. Delete a task\n" +
-                                          "6. Exit the app");
+                                          "1) Add a task\n" +
+                                          "2) Print a current list of tasks\n" +
+                                          "3) Find a task by id or title\n" +
+                                          "4) Edit a task\n" +
+                                          "5) Delete a task\n" +
+                                          "6) Exit the app");
                         int taskMenuChoice = ValidateIntInput(Console.ReadLine());
 
                         switch (taskMenuChoice)
@@ -129,7 +129,7 @@ namespace LearningDiaryMae
 
                             case 3: //finding a task by id or title
                                 Console.Clear();
-                                DiaryTask editDiaryTask = ChooseIdOrTitle("task","find") as DiaryTask;
+                                DiaryTask editDiaryTask = await ChooseIdOrTitle("task","find") as DiaryTask;
                                 if (editDiaryTask != null) Console.WriteLine(editDiaryTask.ToStringPrint());
                                 break;
 
@@ -140,7 +140,7 @@ namespace LearningDiaryMae
 
                             case 5: // deleting by id or title
                                 Console.Clear();
-                                editDiaryTask = ChooseIdOrTitle("task", "delete") as DiaryTask;
+                                editDiaryTask = await ChooseIdOrTitle("task", "delete") as DiaryTask;
                                 await DeleteRow(editDiaryTask);
                                 break;
 
@@ -150,8 +150,7 @@ namespace LearningDiaryMae
                                 Console.WriteLine("Exiting app.");
                                 break;
 
-                            //task menu default
-                            default:
+                            default: //task menu default
                                 Console.WriteLine("Did you choose a number between 1 and 6?");
                                 break;
                         }
