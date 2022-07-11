@@ -15,12 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\ClassLibraryDateMethods\ClassLibraryDateMethods.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Reference Include="ClassLibraryDateMethods">
-      <HintPath>..\..\ClassLibraryDateMethods\bin\Debug\netcoreapp3.1\ClassLibraryDateMethods.dll</HintPath>
+      <HintPath>..\..\Week4\Class Library Datemethods\bin\Debug\netcoreapp3.1\ClassLibraryDateMethods.dll</HintPath>
     </Reference>
   </ItemGroup>
 

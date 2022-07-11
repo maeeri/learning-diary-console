@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace LearningDiaryMae
 {
@@ -40,11 +39,11 @@ namespace LearningDiaryMae
         //printing topics to console
         public string ToStringPrint()
         {
-            string print = $"Id: {Id}\n" +
-                           $"Title: {Title}\n" +
-                           $"Description: {Description}\n" +
-                           $"Started: {StartLearningDate:d.M.yyyy}\n" +
-                           $"Last edited: {LastEditDate:d.M.yyyy h:m:s}\n";
+            string print = $"\t\tId: {Id}\n" +
+                           $"\t\tTitle: {Title}\n" +
+                           $"\t\tDescription: {Description}\n" +
+                           $"\t\tStarted: {StartLearningDate:d.M.yyyy}\n" +
+                           $"\t\tLast edited: {LastEditDate:d.M.yyyy h:m:s}\n";
             return print;
         }
     }

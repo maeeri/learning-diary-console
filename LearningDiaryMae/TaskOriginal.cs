@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace LearningDiaryMae
 {
@@ -22,12 +20,12 @@ namespace LearningDiaryMae
 
         public string ToStringPrint()
         {
-            string toPrint = ($"ID: {Id}\n" +
-                              $"Title: {Title}\n" +
-                              $"Description: {Description}\n" +
-                              $"Notes: {Notes}\n" +
-                              $"Deadline: {Deadline}\n" +
-                              $"Done: {IsDone()}\n");
+            string toPrint = ($"\t\tID: {Id}\n" +
+                              $"\t\tTitle: {Title}\n" +
+                              $"\t\tDescription: {Description}\n" +
+                              $"\t\tNotes: {Notes}\n" +
+                              $"\t\tDeadline: {Deadline}\n" +
+                              $"\t\tDone: {IsDone()}\n");
 
             return toPrint;
         }
