@@ -24,36 +24,5 @@ namespace LearningDiaryMae.Models
         public DateTime? CompletionDate { get; set; }
 
         public virtual ICollection<DiaryTask> Tasks { get; set; }
-
-        //method to calculate time spent on the topic
-        public double CalculateTimeSpent()
-        {
-            TimeSpan timeSpent;
-            double timeSpentDouble;
-            if (InProgress == true)
-            {
-                timeSpent = (TimeSpan)(DateTime.Today - StartLearningDate);
-                timeSpentDouble = timeSpent.TotalDays;
-                CompletionDate = null;
-            }
-
-            else
-            {
-                timeSpent = (TimeSpan)(CompletionDate - StartLearningDate);
-                timeSpentDouble = timeSpent.TotalDays;
-            }
-            return timeSpentDouble;
-        }
-
-        //printing topics to console
-        public string ToStringPrint()
-        {
-            string print = $"\t\tId: {Id}\n" +
-                           $"\t\tTitle: {Title}\n" +
-                           $"\t\tDescription: {Description}\n" +
-                           $"\t\tStarted: {StartLearningDate:d.M.yyyy}\n" +
-                           $"\t\tLast edited: {LastEditDate:d.M.yyyy h:m:s}\n";
-            return print;
-        }
     }
 }

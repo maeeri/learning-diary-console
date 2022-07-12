@@ -8,9 +8,6 @@ namespace LearningDiaryMae
     {
         static async Task Main(string[] args)
         {
-            Console.BackgroundColor = ConsoleColor.DarkGreen;
-            Console.Clear();
-            Console.ForegroundColor = ConsoleColor.White;
             bool continueLoop = true;
             TitleSequence();
 

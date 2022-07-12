@@ -1,39 +1,37 @@
-﻿using System;
+﻿
 
 #nullable disable
+
+using System;
+using System.Collections.Generic;
+using CsvHelper;
 
 namespace LearningDiaryMae.Models
 {
     public partial class DiaryTask
     {
+        public DiaryTask()
+        {
+            NotesNavigation = new HashSet<Note>();
+        }
+
         public int Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
-        public string Notes { get; set; }
+        public int? Notes { get; set; }
         public DateTime? Deadline { get; set; }
-        public string Priority { get; set; }
+        public int? Priority { get; set; }
         public bool? Done { get; set; }
         public int? Topic { get; set; }
 
-        public virtual DiaryTopic DiaryTopicNavigation { get; set; }
-
-        private string IsDone()
+        public enum PriorityEnum
         {
-            return (Done == true) ? "yes" : "no";
+            First = 1,
+            Second = 2,
+            Optional = 3
         }
 
-        public string ToStringPrint()
-        {
-            string toPrint = ($"\t\tID: {Id}\n" +
-                              $"\t\tTitle: {Title}\n" +
-                              $"\t\tDescription: {Description}\n" +
-                              $"\t\tNotes: {Notes}\n" +
-                              $"\t\tDeadline: {Deadline}\n" +
-                              $"\t\tDone: {IsDone()}\n");
-
-            return toPrint;
-        }
+        public virtual DiaryTopic TopicNavigation { get; set; }
+        public virtual ICollection<Note> NotesNavigation { get; set; }
     }
-
-
 }

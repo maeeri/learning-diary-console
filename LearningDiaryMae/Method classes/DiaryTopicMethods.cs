@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using LearningDiaryMae.Models;
 using ClassLibraryDateMethods;
@@ -13,6 +14,7 @@ namespace LearningDiaryMae
         {
             bool topicMenu = true;
 
+            Console.Clear();
             //ask what the user wants to do and go to switch
             Console.WriteLine(" What do you want to do?\n" +
                               "\t1) Add a topic of study\n" +
@@ -41,7 +43,7 @@ namespace LearningDiaryMae
                 case 3: //finding a topic by id or title
                     Console.Clear();
                     DiaryTopic editDiaryTopic = await ChooseIdOrTitle("topic", "find") as DiaryTopic;
-                    if (editDiaryTopic != null) Console.WriteLine(editDiaryTopic.ToStringPrint());
+                    if (editDiaryTopic != null) Console.WriteLine(TopicToPrint(editDiaryTopic));
                     break;
 
                 case 4: //editing by id or title
@@ -53,6 +55,7 @@ namespace LearningDiaryMae
                     Console.Clear();
                     editDiaryTopic = await ChooseIdOrTitle("topic", "delete") as DiaryTopic;
                     DeleteRow(editDiaryTopic);
+                    Console.WriteLine($" Topic {editDiaryTopic.Id}: {editDiaryTopic.Title} deleted");
                     break;
 
                 case 6: //print tasks related to a specific topic
@@ -68,7 +71,7 @@ namespace LearningDiaryMae
 
                 //topic menu default
                 default:
-                    Console.WriteLine(" Did you choose a number between 1 and 7?");
+                    AlertInvalidChoice(7);
                     break;
             }
 
@@ -121,15 +124,13 @@ namespace LearningDiaryMae
                 LastEditDate = lastEditDate,
                 InProgress = inProgress
             };
-            newDiaryTopic.TimeSpent = (int?)newDiaryTopic.CalculateTimeSpent();
+            newDiaryTopic.TimeSpent = (int?)CalculateTimeSpent(newDiaryTopic);
 
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
                 newContext.Topics.Add(newDiaryTopic);
                 await newContext.SaveChangesAsync();
             }
-
-            ;
         }
 
         //prints topics from database
@@ -141,8 +142,9 @@ namespace LearningDiaryMae
                 IQueryable<DiaryTopic> read = newContext.Topics.Select(topic => topic);
                 foreach (var topic in read)
                 {
-                    Console.WriteLine(topic.ToStringPrint());
-                    Console.WriteLine("\t\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    Console.WriteLine(TopicToPrint(topic));
+                    Console.WriteLine("\t\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+                    Thread.Sleep(1000);
                 }
             }
             Console.WriteLine("\n\n");
@@ -165,16 +167,15 @@ namespace LearningDiaryMae
                         Console.WriteLine(" The date you gave seems to be in the future. Is your study finished? Yes/no");
                         bool studyComplete = ValidateYesOrNoInput(Console.ReadLine());
 
-                        if (studyComplete)
-                        {
-                            inProgress = false;
-                            continue;
-                        }
-                        else
+                        if (!studyComplete)
                         {
                             inProgress = true;
+                            completionDate = null;
                             break;
                         }
+
+                        inProgress = false;
+                        continue;
                     }
                 }
                 catch (Exception e)
@@ -200,8 +201,8 @@ namespace LearningDiaryMae
 
                 foreach (var item in tasks)
                 {
-                    Console.WriteLine(item.ToStringPrint());
-                    Console.WriteLine("\n\t\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                    DiaryTaskMethods.TaskToPrint(item);
+                    Console.WriteLine("\t\t~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
                 }
             }
         }
@@ -221,18 +222,15 @@ namespace LearningDiaryMae
             switch (topicFieldChoice)
             {
                 case 1:
-                    Console.WriteLine(" Enter the new title:");
-                    editDiaryTopic.Title = Console.ReadLine();
+                    editDiaryTopic.Title = GetStringInput("title");
                     break;
 
                 case 2:
-                    Console.WriteLine(" Enter the new description:");
-                    editDiaryTopic.Description = Console.ReadLine();
+                    editDiaryTopic.Description = GetStringInput("description");
                     break;
 
                 case 3:
-                    Console.WriteLine(" Enter the source:");
-                    editDiaryTopic.Source = Console.ReadLine();
+                    editDiaryTopic.Source = GetStringInput("source");
                     break;
 
                 case 4:
@@ -242,16 +240,46 @@ namespace LearningDiaryMae
                     break;
 
                 default:
-                    Console.ForegroundColor = ConsoleColor.DarkRed;
-                    Console.WriteLine(" Did you choose a number between 1 and 4?");
-                    Console.ForegroundColor = ConsoleColor.White;
+                    AlertInvalidChoice(4);
                     break;
             }
 
             using (LearningDiaryContext newContext = new LearningDiaryContext())
             {
-                newContext.SaveChanges();
+                newContext.Update(editDiaryTopic);
+                await newContext.SaveChangesAsync();
             }
+        }
+
+        //method to calculate time spent on the topic
+        public static double CalculateTimeSpent(DiaryTopic topic)
+        {
+            TimeSpan timeSpent;
+            double timeSpentDouble;
+            if (topic.InProgress == true)
+            {
+                timeSpent = (TimeSpan)(DateTime.Today - topic.StartLearningDate);
+                timeSpentDouble = timeSpent.TotalDays;
+                topic.CompletionDate = null;
+            }
+
+            else
+            {
+                timeSpent = (TimeSpan)(topic.CompletionDate - topic.StartLearningDate);
+                timeSpentDouble = timeSpent.TotalDays;
+            }
+            return timeSpentDouble;
+        }
+
+        //printing topics to console
+        public static string TopicToPrint(DiaryTopic topic)
+        {
+            string print = $"\t\tId: {topic.Id}\n" +
+                           $"\t\tTitle: {topic.Title}\n" +
+                           $"\t\tDescription: {topic.Description}\n" +
+                           $"\t\tStarted: {topic.StartLearningDate:d.M.yyyy}\n" +
+                           $"\t\tLast edited: {topic.LastEditDate:d.M.yyyy h:m:s}\n";
+            return print;
         }
     }
 }

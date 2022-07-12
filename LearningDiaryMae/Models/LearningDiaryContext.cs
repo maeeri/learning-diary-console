@@ -1,7 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿
 
 #nullable disable
 
+using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 namespace LearningDiaryMae.Models
 {
     public partial class LearningDiaryContext : DbContext
@@ -15,6 +19,7 @@ namespace LearningDiaryMae.Models
         {
         }
 
+        public virtual DbSet<Note> Notes { get; set; }
         public virtual DbSet<DiaryTask> Tasks { get; set; }
         public virtual DbSet<DiaryTopic> Topics { get; set; }
 
@@ -31,6 +36,35 @@ namespace LearningDiaryMae.Models
         {
             modelBuilder.HasAnnotation("Relational:Collation", "Latin1_General_CI_AS");
 
+            modelBuilder.Entity<Note>(entity =>
+            {
+                entity.Property(e => e.Note1)
+                    .HasMaxLength(140)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note2)
+                    .HasMaxLength(140)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note3)
+                    .HasMaxLength(140)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note4)
+                    .HasMaxLength(140)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Note5)
+                    .HasMaxLength(140)
+                    .IsUnicode(false);
+
+                entity.HasOne(d => d.TaskNavigation)
+                    .WithMany(p => p.NotesNavigation)
+                    .HasForeignKey(d => d.Task)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("task_id");
+            });
+
             modelBuilder.Entity<DiaryTask>(entity =>
             {
                 entity.ToTable("task");
@@ -41,19 +75,13 @@ namespace LearningDiaryMae.Models
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.Property(e => e.Notes).IsUnicode(false);
-
-                entity.Property(e => e.Priority)
-                    .HasMaxLength(60)
-                    .IsUnicode(false);
-
                 entity.Property(e => e.Title)
                     .IsRequired()
                     .HasMaxLength(255)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.DiaryTopicNavigation)
-                    .WithMany(p => p.Tasks)
+                entity.HasOne(d => d.TopicNavigation)
+                    .WithMany(p => (IEnumerable<DiaryTask>)p.Tasks)
                     .HasForeignKey(d => d.Topic)
                     .HasConstraintName("FK__task__topic_id__36B12243");
             });

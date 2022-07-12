@@ -43,29 +43,38 @@ namespace LearningDiaryMae
                     mainMenu = false;
                     break;
                 default:
-                    Console.WriteLine(" Did you write a number between 1 and 3?");
+                    AlertInvalidChoice(3);
                     mainMenu = true;
                     break;
             }
             return mainMenu;
         }
 
-
+        //fancy title sequence
         public static void TitleSequence()
         {
-            //fancy title sequence
+            Console.BackgroundColor = ConsoleColor.DarkGreen;
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
             Console.Write("\t\t   ");
-            for (int i = 0; i < 64; i++)
+            for (int i = 0; i < 7; i++)
             {
-                Console.Write("~");
-                Thread.Sleep(10);
+                Console.Write("\"`-._, -'");
+                Thread.Sleep(75);
             }
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.Write("\n" + asciiart + "\n\t\t   ");
-            for (int i = 0; i < 64; i++)
+            Console.ForegroundColor = ConsoleColor.Yellow;
+
+            for (int i = 0; i < 7; i++)
             {
-                Console.Write("~");
-                Thread.Sleep(10);
+                Console.Write("\"`-._, -'");
+                Thread.Sleep(75);
             }
+
+            Console.WriteLine(Environment.NewLine);
         }
 
         //choosing topic or task by id or title, target = topic or task, procedure = thing to be done to the topic
@@ -99,8 +108,8 @@ namespace LearningDiaryMae
 
                     if (edit != null)
                         return edit;
-                    else
-                        Console.WriteLine($" The id or title of the {target} you gave doesn't seem to exist. Please try again.");
+                    
+                    Console.WriteLine($" The id or title of the {target} you gave doesn't seem to exist. Please try again.");
                 }
             }
         }
@@ -112,15 +121,10 @@ namespace LearningDiaryMae
             while (true)
             {
                 if (int.TryParse(input, out newInput))
-                {
                     break;
-                }
-                else
-                {
-                    Console.WriteLine(" Please give a number:");
-                    input = Console.ReadLine();
-                    continue;
-                }
+                
+                Console.WriteLine(" Please give a number:");
+                input = Console.ReadLine();
             }
             return newInput;
         }
@@ -132,15 +136,10 @@ namespace LearningDiaryMae
             while (true)
             {
                 if (DateTime.TryParse(input, out newInput))
-                {
                     break;
-                }
-                else
-                {
-                    Console.WriteLine(" Please give a date (DD/MM/YYYY):");
-                    input = Console.ReadLine();
-                    continue;
-                }
+                
+                Console.WriteLine(" Please give a date (DD/MM/YYYY):"); 
+                input = Console.ReadLine();
             }
             return newInput;
         }
@@ -197,6 +196,13 @@ namespace LearningDiaryMae
         {
             Console.WriteLine(" Press enter to continue");
             Console.ReadKey();
+        }
+
+        public static void AlertInvalidChoice(int maxNumber)
+        {
+            Console.ForegroundColor = ConsoleColor.DarkRed;
+            Console.WriteLine($" Did you choose a number between 1 and {maxNumber}?");
+            Console.ForegroundColor = ConsoleColor.White;
         }
 
         public static string asciiart = @"                     ,    _, _   ,_  ,  , ___,,  ,  _,      ,_   ___,_   ,_    ,  ,
